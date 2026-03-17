@@ -62,94 +62,104 @@ export default function RegisterScreen() {
   };
 
   return (
-    <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.gradient}>
+    <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} className="flex-1">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
+        className="flex-1"
+      >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40 }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View style={styles.card}>
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="bg-white/5 rounded-3xl border border-white/10 py-10 px-7 backdrop-blur-md">
             {/* Brand */}
-            <View style={styles.brandWrapper}>
-              <View style={styles.iconCircle}>
-                <Text style={styles.iconText}>✦</Text>
+            <View className="items-center mb-9">
+              <View className="w-16 h-16 rounded-full bg-violet-500/25 border border-violet-500 justify-center items-center mb-4">
+                <Text className="text-3xl text-violet-300">✦</Text>
               </View>
-              <Text style={styles.appName}>Crisol Ideas</Text>
-              <Text style={styles.tagline}>Crea tu cuenta</Text>
+              <Text className="text-2xl font-bold text-gray-50 tracking-wide">Crisol Ideas</Text>
+              <Text className="text-sm text-gray-400 mt-1">Crea tu cuenta</Text>
             </View>
 
             {/* Fields */}
-            <View style={styles.form}>
-              <Text style={styles.label}>Nombre</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Tu nombre"
-                placeholderTextColor="#6b7280"
-                autoCapitalize="words"
-                value={name}
-                onChangeText={setName}
-              />
+            <View className="gap-y-4">
+              <View>
+                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Nombre</Text>
+                <TextInput
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
+                  placeholder="Tu nombre"
+                  placeholderTextColor="#6b7280"
+                  autoCapitalize="words"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
 
-              <Text style={styles.label}>Correo electrónico</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="tu@email.com"
-                placeholderTextColor="#6b7280"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={setEmail}
-              />
+              <View>
+                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Correo electrónico</Text>
+                <TextInput
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
+                  placeholder="tu@email.com"
+                  placeholderTextColor="#6b7280"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
 
-              <Text style={styles.label}>Contraseña</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Mínimo 6 caracteres"
-                placeholderTextColor="#6b7280"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
+              <View>
+                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Contraseña</Text>
+                <TextInput
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
+                  placeholder="Mínimo 6 caracteres"
+                  placeholderTextColor="#6b7280"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
 
-              <Text style={styles.label}>Confirmar contraseña</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Repite tu contraseña"
-                placeholderTextColor="#6b7280"
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-              />
+              <View>
+                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Confirmar contraseña</Text>
+                <TextInput
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
+                  placeholder="Repite tu contraseña"
+                  placeholderTextColor="#6b7280"
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+              </View>
 
               {error && (
-                <View style={styles.errorBox}>
-                  <Text style={styles.errorText}>{error}</Text>
+                <View className="bg-red-500/15 border border-red-500/40 rounded-lg p-3 mt-3.5">
+                  <Text className="text-red-300 text-[13px] text-center">{error}</Text>
                 </View>
               )}
 
               <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  pressed && styles.buttonPressed,
-                ]}
+                className={`bg-violet-600 rounded-2xl py-4 items-center mt-6 active:opacity-85 active:scale-[0.98] ${
+                  isSubmitting ? 'opacity-70' : 'opacity-100'
+                }`}
                 onPress={handleRegister}
-                disabled={isSubmitting}>
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.buttonText}>Crear cuenta</Text>
+                  <Text className="text-white font-bold text-base tracking-wide">Crear cuenta</Text>
                 )}
               </Pressable>
             </View>
 
             {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
+            <View className="flex-row justify-center mt-8">
+              <Text className="text-sm text-gray-400">¿Ya tienes cuenta? </Text>
               <Pressable onPress={() => router.back()}>
-                <Text style={styles.footerLink}>Inicia sesión</Text>
+                <Text className="text-sm text-violet-400 font-bold">Inicia sesión</Text>
               </Pressable>
             </View>
           </View>
@@ -159,125 +169,4 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-  },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    paddingVertical: 40,
-    paddingHorizontal: 28,
-  },
-  brandWrapper: {
-    alignItems: 'center',
-    marginBottom: 36,
-  },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(147,112,219,0.25)',
-    borderWidth: 1.5,
-    borderColor: '#9370db',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  iconText: {
-    fontSize: 28,
-    color: '#c084fc',
-  },
-  appName: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#f3f4f6',
-    letterSpacing: 0.5,
-  },
-  tagline: {
-    fontSize: 14,
-    color: '#9ca3af',
-    marginTop: 4,
-  },
-  form: {
-    gap: 4,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#d1d5db',
-    marginBottom: 6,
-    marginTop: 14,
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: '#f9fafb',
-    fontSize: 15,
-  },
-  errorBox: {
-    backgroundColor: 'rgba(239,68,68,0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(239,68,68,0.4)',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginTop: 14,
-  },
-  errorText: {
-    color: '#fca5a5',
-    fontSize: 13,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#7c3aed',
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 24,
-    shadowColor: '#7c3aed',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  buttonPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
-    letterSpacing: 0.4,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 32,
-  },
-  footerText: {
-    color: '#9ca3af',
-    fontSize: 14,
-  },
-  footerLink: {
-    color: '#c084fc',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+

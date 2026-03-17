@@ -1,7 +1,7 @@
 // config/apiClient.ts para React Native
-import storage from '../lib/storage';
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 import { ACCESS_TOKEN_KEY, urlServer } from "../config/config";
+import storage from '../lib/storage';
 
 const apiClient = axios.create({
     baseURL: urlServer,

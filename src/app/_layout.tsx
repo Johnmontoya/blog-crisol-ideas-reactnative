@@ -13,6 +13,7 @@ import UserContextProvider from "../context/UserContextProvider";
 import routerMeta from "../types/routerMeta";
 
 // Importaciones manuales
+import "../assets/global.css";
 import ForgotPage from "./(auth)/forgot-password";
 import LoginPage from "./(auth)/login";
 import RegisterPage from "./(auth)/register";

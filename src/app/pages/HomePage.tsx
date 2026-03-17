@@ -4,10 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
     Dimensions,
+    Pressable,
     ScrollView,
-    StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,29 +26,29 @@ const HomePage = () => {
     ];
 
     return (
-        <View style={styles.container}>
+        <View className="flex-1 bg-slate-50">
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Hero Section */}
-                <View style={styles.heroContainer}>
+                <View className="h-[450px] w-full relative">
                     <Image
                         source="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop"
-                        style={styles.heroImage}
+                        className="flex-1"
                         contentFit="cover"
                     />
                     <LinearGradient
                         colors={['transparent', 'rgba(0,0,0,0.8)']}
-                        style={styles.gradient}
+                        className="absolute left-0 right-0 bottom-0 h-3/5"
                     />
-                    <View style={styles.heroTextContainer}>
+                    <View className="absolute bottom-10 left-5 right-5">
                         <Animated.Text 
                             entering={FadeInUp.delay(200).duration(800)}
-                            style={styles.heroTitle}
+                            className="text-[42px] font-[900] text-white tracking-tighter"
                         >
                             Crisol de Ideas
                         </Animated.Text>
                         <Animated.Text 
                             entering={FadeInUp.delay(400).duration(800)}
-                            style={styles.heroSubtitle}
+                            className="text-lg text-white/90 mt-2.5 leading-6"
                         >
                             Explora pensamientos, historias y conocimiento en un solo lugar.
                         </Animated.Text>
@@ -57,57 +56,57 @@ const HomePage = () => {
                 </View>
 
                 {/* Content */}
-                <SafeAreaView style={styles.content}>
+                <SafeAreaView className="px-5 mt-5">
                     <Animated.View 
                         entering={FadeInDown.delay(600).duration(800)}
-                        style={styles.sectionHeader}
+                        className="flex-row justify-between items-center mb-5"
                     >
-                        <Text style={styles.sectionTitle}>Categorías</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.seeAll}>Ver todas</Text>
-                        </TouchableOpacity>
+                        <Text className="text-[22px] font-bold text-slate-800">Categorías</Text>
+                        <Pressable className="active:opacity-60">
+                            <Text className="text-indigo-500 font-semibold">Ver todas</Text>
+                        </Pressable>
                     </Animated.View>
 
                     <ScrollView 
                         horizontal 
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.categoriesList}
+                        contentContainerStyle={{ paddingRight: 20 }}
                     >
                         {categories.map((cat, index) => (
                             <Animated.View 
                                 key={cat.id}
                                 entering={FadeInDown.delay(700 + index * 100).duration(600)}
                             >
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryIcon}>{cat.icon}</Text>
-                                    <Text style={styles.categoryName}>{cat.name}</Text>
-                                </TouchableOpacity>
+                                <Pressable className="bg-white p-5 rounded-[20px] mr-4 items-center w-30 shadow-sm shadow-black active:scale-[0.97] active:bg-slate-50">
+                                    <Text className="text-[32px] mb-2.5">{cat.icon}</Text>
+                                    <Text className="text-sm font-semibold text-slate-500">{cat.name}</Text>
+                                </Pressable>
                             </Animated.View>
                         ))}
                     </ScrollView>
 
                     <Animated.View 
                         entering={FadeInDown.delay(1000).duration(800)}
-                        style={styles.ctaContainer}
+                        className="mt-10 bg-white p-7 rounded-[30px] items-center shadow-md shadow-black/5"
                     >
-                        <Text style={styles.ctaTitle}>¿Listo para unirte?</Text>
-                        <Text style={styles.ctaText}>
+                        <Text className="text-2xl font-extrabold text-slate-800">¿Listo para unirte?</Text>
+                        <Text className="text-base text-slate-500 text-center mt-2.5 mb-6 leading-6">
                             Crea tu cuenta hoy y comienza a compartir tus propias ideas con el mundo.
                         </Text>
                         
-                        <TouchableOpacity 
-                            style={styles.button}
+                        <Pressable 
+                            className="w-full h-14 rounded-2xl overflow-hidden active:scale-[0.98] active:opacity-90"
                             onPress={() => navigation.navigate(routerMeta.LoginPage.name)}
                         >
                             <LinearGradient
                                 colors={['#6366f1', '#a855f7']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
-                                style={styles.buttonGradient}
+                                className="flex-1 justify-center items-center"
                             >
-                                <Text style={styles.buttonText}>Comenzar Ahora</Text>
+                                <Text className="text-white text-lg font-bold">Comenzar Ahora</Text>
                             </LinearGradient>
-                        </TouchableOpacity>
+                        </Pressable>
                     </Animated.View>
                 </SafeAreaView>
                 <View style={{ height: 40 }} />
@@ -116,129 +115,6 @@ const HomePage = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f8fafc',
-    },
-    heroContainer: {
-        height: 450,
-        width: '100%',
-        position: 'relative',
-    },
-    heroImage: {
-        flex: 1,
-    },
-    gradient: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: '60%',
-    },
-    heroTextContainer: {
-        position: 'absolute',
-        bottom: 40,
-        left: 20,
-        right: 20,
-    },
-    heroTitle: {
-        fontSize: 42,
-        fontWeight: '900',
-        color: '#fff',
-        letterSpacing: -1,
-    },
-    heroSubtitle: {
-        fontSize: 18,
-        color: 'rgba(255,255,255,0.9)',
-        marginTop: 10,
-        lineHeight: 26,
-    },
-    content: {
-        paddingHorizontal: 20,
-        marginTop: 20,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    sectionTitle: {
-        fontSize: 22,
-        fontWeight: '700',
-        color: '#1e293b',
-    },
-    seeAll: {
-        color: '#6366f1',
-        fontWeight: '600',
-    },
-    categoriesList: {
-        paddingRight: 20,
-    },
-    categoryCard: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 20,
-        marginRight: 15,
-        alignItems: 'center',
-        width: 120,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        elevation: 5,
-    },
-    categoryIcon: {
-        fontSize: 32,
-        marginBottom: 10,
-    },
-    categoryName: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#64748b',
-    },
-    ctaContainer: {
-        marginTop: 40,
-        backgroundColor: '#fff',
-        padding: 30,
-        borderRadius: 30,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.05,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    ctaTitle: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: '#1e293b',
-    },
-    ctaText: {
-        fontSize: 16,
-        color: '#64748b',
-        textAlign: 'center',
-        marginTop: 10,
-        marginBottom: 25,
-        lineHeight: 24,
-    },
-    button: {
-        width: '100%',
-        height: 56,
-        borderRadius: 16,
-        overflow: 'hidden',
-    },
-    buttonGradient: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '700',
-    },
-});
+
 
 export default HomePage;
