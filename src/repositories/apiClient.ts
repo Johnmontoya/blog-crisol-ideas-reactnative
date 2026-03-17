@@ -1,5 +1,5 @@
 // config/apiClient.ts para React Native
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../lib/storage';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { ACCESS_TOKEN_KEY, urlServer } from "../config/config";
 
@@ -12,18 +12,18 @@ const apiClient = axios.create({
     }
 });
 
-// Función para obtener token de AsyncStorage
+// Función para obtener token de Storage con fallback
 const getToken = async (): Promise<string | null> => {
     try {
-        return await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
+        return await storage.getItem(ACCESS_TOKEN_KEY);
     } catch (error) {
-        console.error('Error getting token from AsyncStorage:', error);
+        console.error('Error getting token from store:', error);
         return null;
     }
 };
 
 // Log condicional para desarrollo
-const logOnDev = (message: string, log?: AxiosResponse | InternalAxiosRequestConfig | AxiosError) => {
+const logOnDev = (message: string, log?: any) => {
     if (__DEV__) { // __DEV__ es la variable global de React Native para modo desarrollo
         console.log(message, log);
     }

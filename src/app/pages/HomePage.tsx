@@ -4,13 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
     Dimensions,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import routerMeta from '../../types/routerMeta';
 

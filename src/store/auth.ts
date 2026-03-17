@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import storage from "../lib/storage";
 
 type State = {
     userId: string;
@@ -11,8 +12,22 @@ type Actions = {
     logout: () => void;
 }
 
-export const useAuthStore = create(
-    persist<State & Actions>(
+// Adaptador para que Zustand use nuestro storage personalizado
+const zustandStorage = createJSONStorage<State & Actions>(() => ({
+    getItem: async (key: string) => {
+        const val = await storage.getItem(key);
+        return val ?? null;
+    },
+    setItem: async (key: string, value: string) => {
+        await storage.setItem(key, value);
+    },
+    removeItem: async (key: string) => {
+        await storage.removeItem(key);
+    },
+}));
+
+export const useAuthStore = create<State & Actions>()(
+    persist(
         (set) => ({
             userId: '',
             token: '',
@@ -28,8 +43,10 @@ export const useAuthStore = create(
                     token: '',
                 }))
             },
-        }), {
-        name: 'auth'
-    }
+        }),
+        {
+            name: 'auth',
+            storage: zustandStorage,
+        }
     )
 )
