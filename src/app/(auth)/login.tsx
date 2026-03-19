@@ -15,6 +15,7 @@ import {
   Pressable,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -74,9 +75,9 @@ export default function LoginScreen() {
         <View className="bg-white/10 rounded-[32px] border border-white/10 py-10 px-8 backdrop-blur-md">
           {/* Brand */}
           <View className="items-center mb-9">
-            <View className="w-16 h-16 rounded-full bg-violet-500/20 border border-violet-500/50 justify-center items-center mb-4">
+            <TouchableOpacity onPress={() => navigation.navigate(routerMeta.HomePage.name)} className="w-16 h-16 rounded-full bg-violet-500/20 border border-violet-500/50 justify-center items-center mb-4">
               <Text className="text-3xl text-violet-400">✦</Text>
-            </View>
+            </TouchableOpacity>
             <Text className="text-3xl font-bold text-gray-100 tracking-tight">Crisol Ideas</Text>
             <Text className="text-sm text-gray-400 mt-1">Bienvenido de vuelta</Text>
           </View>
@@ -107,6 +108,12 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
               />
+              <Pressable
+                onPress={() => navigation.navigate(routerMeta.ForgotPage.name)}
+                className="mt-2 self-end"
+              >
+                <Text className="text-xs text-violet-400 font-semibold mr-1">¿Olvidaste tu contraseña?</Text>
+              </Pressable>
             </View>
 
             {error && (
@@ -118,9 +125,8 @@ export default function LoginScreen() {
             <Pressable
               onPress={handleLogin}
               disabled={isSubmitting}
-              className={`bg-violet-600 rounded-2xl py-4 items-center mt-8 active:opacity-80 active:scale-[0.98] ${
-                isSubmitting ? 'opacity-70' : 'opacity-100'
-              }`}
+              className={`bg-violet-600 rounded-2xl py-4 items-center mt-8 active:opacity-80 active:scale-[0.98] ${isSubmitting ? 'opacity-70' : 'opacity-100'
+                }`}
             >
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />

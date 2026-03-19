@@ -1,7 +1,8 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
-import { useAuth } from '@/context/UserContextProvider';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useGetUserIdQueries } from '@/queries/query/user.query';
+import { useAuthStore } from '@/store/auth';
 import React from 'react';
 import {
   Dimensions,
@@ -15,7 +16,9 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { userId, logout } = useAuthStore();
+  const [data] = useGetUserIdQueries(userId);
+  const user = data.data?.user;
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 

@@ -90,9 +90,36 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         
                         <View style={styles.divider} />
 
+                        {/* Opciones según el ROL */}
+                        {role === 'Admin' && (
+                            <>
+                                <TouchableOpacity style={styles.menuItem} onPress={() => {
+                                    setMenuVisible(false);
+                                    setTimeout(() => {
+                                        navigation.navigate(routerMeta.UserList.name);
+                                    }, 100);
+                                }}>
+                                    <Ionicons name="people-outline" size={20} color="#1e293b" />
+                                    <Text style={styles.menuItemText}>Usuarios</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.menuItem} onPress={() => {
+                                    setMenuVisible(false);
+                                    setTimeout(() => {
+                                        navigation.navigate(routerMeta.AddBlog.name);
+                                    }, 100);
+                                }}>
+                                    <Ionicons name="add-circle-outline" size={20} color="#1e293b" />
+                                    <Text style={styles.menuItemText}>Agregar Blog</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
+
                         <TouchableOpacity style={styles.menuItem} onPress={() => {
                             setMenuVisible(false);
-                            navigation.navigate(routerMeta.ProfilePage.name);
+                            setTimeout(() => {
+                                navigation.navigate(routerMeta.ProfilePage.name);
+                            }, 100);
                         }}>
                             <Ionicons name="person-outline" size={20} color="#1e293b" />
                             <Text style={styles.menuItemText}>Perfil</Text>
@@ -100,7 +127,9 @@ export default function DashboardNavbar({ title }: NavbarProps) {
 
                         <TouchableOpacity style={styles.menuItem} onPress={() => {
                             setMenuVisible(false);
-                            navigation.navigate(routerMeta.HomePage.name);
+                            setTimeout(() => {
+                                navigation.navigate(routerMeta.HomePage.name);
+                            }, 100);
                         }}>
                             <Ionicons name="home-outline" size={20} color="#1e293b" />
                             <Text style={styles.menuItemText}>Ir al Inicio</Text>

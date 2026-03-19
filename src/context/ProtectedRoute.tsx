@@ -10,7 +10,7 @@ interface IProtectedRoute {
 }
 
 const ProtectedRoute = ({ children, path }: IProtectedRoute) => {
-    const { isLogin, role, hasValidToken } = useContext(UserContext);
+    const { isLogin, role, hasValidToken, isLoading } = useContext(UserContext);
     const navigation = useNavigation<any>();
 
     // -------------------------
@@ -27,6 +27,7 @@ const ProtectedRoute = ({ children, path }: IProtectedRoute) => {
         currentRoute?.isAuth === false || currentRoute?.isCommon === true;
 
     React.useEffect(() => {
+        if (isLoading) return; // Esperar a que cargue la autenticación
         const handleNavigation = async () => {
             const state = navigation.getState();
             const currentRouteName = state?.routes[state?.index]?.name;
@@ -55,22 +56,28 @@ const ProtectedRoute = ({ children, path }: IProtectedRoute) => {
 
             // SOLO NAVEGAR SI EL DESTINO ES DISTINTO AL ACTUAL
             if (targetName && currentRouteName !== targetName) {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: targetName }],
-                });
+                // IMPORTANT: Defer navigation outside the render cycle to prevent Node removal errors on Web
+                setTimeout(() => {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: targetName }],
+                    });
+                }, 0);
             }
         };
 
         handleNavigation();
     }, [isLogin, role, path, navigation, currentRoute]);
 
+    // Si se está cargando la autenticación, no mostramos nada
+    if (isLoading) return null;
+
     // Si es pública o las condiciones permiten mostrar el contenido
     if (isPublicRoute || (isLogin && hasValidToken)) {
         return children;
     }
 
-    // Mientras verificamos, no mostrar nada o mostrar un loading
+    // Mientras redirigimos, no mostrar nada
     return null;
 };
 

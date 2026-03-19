@@ -1,12 +1,14 @@
-import MyTabs from "@/components/TabsMenu";
-import { StyleSheet, View } from "react-native";
-import DashboardNavbar from "../../components/DashboardNavbar";
+import { StyleSheet, Text, View } from "react-native";
+import DashboardNavbar from "../../../components/DashboardNavbar";
 
-export default function UserDashboard() {
+export default function AddBlog() {
     return (
         <View style={styles.container}>
-            <DashboardNavbar title="User Panel" />
-            <MyTabs />
+            <DashboardNavbar title="Agregar Blog" />
+            <View style={styles.content}>
+                <Text style={styles.text}>Nuevo Blog</Text>
+                <Text style={styles.subtext}>Crea una nueva entrada para el blog de Crisol Ideas.</Text>
+            </View>
         </View>
     );
 }
@@ -31,5 +33,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#64748b',
         marginTop: 10,
+        textAlign: 'center',
     }
 });

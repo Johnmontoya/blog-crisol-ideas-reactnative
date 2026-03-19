@@ -9,6 +9,16 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface IForgot {
+  email: string;
+}
+
+export interface IResetPassword {
+  userId: string;
+  password: string;
+  token: string;
+}
+
 export interface AuthUser {
   id: string | number;
   username: string;
@@ -57,4 +67,14 @@ export interface IUsersResponse {
 export interface IUserResponse {
   valid: string;
   user: IUser
+}
+
+export interface IVerified {
+  userId: string;
+  verified: boolean;
+}
+
+export interface IVerify {
+  userId: String;
+  otp: String;
 }

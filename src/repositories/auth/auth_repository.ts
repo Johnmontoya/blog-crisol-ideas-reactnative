@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { IAuthResponse, IResponse, IUserResponse, IUsersResponse, LoginRequest, RegisterRequest } from "../../types/auth";
+import { IAuthResponse, IForgot, IResetPassword, IResponse, IUserResponse, IUsersResponse, IVerified, IVerify, LoginRequest, RegisterRequest } from "../../types/auth";
 import apiClient from "../apiClient";
 
 export const postLogin = async (data: LoginRequest):
@@ -35,3 +35,53 @@ export const getUserId = async (
         url: `/api/v1/user/user/${id}`,
     });
 };
+
+export const forgotPassword = async (
+    data: IForgot
+): Promise<AxiosResponse<IResponse>> => {
+    return await apiClient<IResponse>({
+        method: "post",
+        url: `/api/v1/user/forgot`,
+        data: data,
+    });
+};
+
+export const resetPassword = async (
+    data: IResetPassword
+): Promise<AxiosResponse<IResponse>> => {
+    return await apiClient<IResponse>({
+        method: "post",
+        url: `/api/v1/user/reset`,
+        data: data,
+    });
+};
+
+export const userState = async ({ userId, verified }: IVerified): Promise<AxiosResponse<IResponse>> => {
+    return await apiClient<IResponse>({
+        method: "put",
+        url: `/api/v1/user/change-state`,
+        data: {
+            userId,
+            verified
+        }
+    });
+}
+
+export const deleteUserId = async (
+    id: string
+): Promise<AxiosResponse<IResponse>> => {
+    return await apiClient<IResponse>({
+        method: "delete",
+        url: `/api/v1/user/user/${id}`,
+    });
+};
+
+export const verifyuser = async (
+    data: IVerify
+): Promise<AxiosResponse<IResponse>> => {
+    return await apiClient<IResponse>({
+        method: "put",
+        url: `/api/v1/user/verifyuser`,
+        data: data
+    });
+}

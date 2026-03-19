@@ -1,12 +1,14 @@
-import MyTabs from "@/components/TabsMenu";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import DashboardNavbar from "../../components/DashboardNavbar";
 
-export default function UserDashboard() {
+export default function ProfilePage() {
     return (
         <View style={styles.container}>
-            <DashboardNavbar title="User Panel" />
-            <MyTabs />
+            <DashboardNavbar title="Perfil" />
+            <View style={styles.content}>
+                <Text style={styles.text}>Mi Perfil</Text>
+                <Text style={styles.subtext}>Aquí puedes ver y editar tu información personal.</Text>
+            </View>
         </View>
     );
 }
@@ -31,5 +33,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#64748b',
         marginTop: 10,
+        textAlign: 'center',
     }
 });

@@ -18,10 +18,14 @@ import ForgotPage from "./(auth)/forgot-password";
 import LoginPage from "./(auth)/login";
 import RegisterPage from "./(auth)/register";
 import ResetPassPage from "./(auth)/reset-password";
-import UserVerifyPage from "./(auth)/veirfy";
+import UserVerifyPage from "./(auth)/verify";
 import AdminDashboard from "./pages/AdminDashboard";
+import BlogPage from "./pages/BlogPage";
 import HomePage from "./pages/HomePage";
+import ProfilePage from "./pages/ProfilePage";
 import UserDashboard from "./pages/UserDashboard";
+import UserListPage from "./pages/UserListPage";
+import AddBlog from "./pages/blog/AddBlog";
 
 const queryClient = new QueryClient();
 const Stack = createNativeStackNavigator();
@@ -36,27 +40,14 @@ const pageComponents = {
   [routerMeta.HomePage.name]: HomePage,
   [routerMeta.DashboardAdminPage.name]: AdminDashboard,
   [routerMeta.DashboardUsersPage.name]: UserDashboard,
+  [routerMeta.BlogPage.name]: BlogPage,
+  [routerMeta.ProfilePage.name]: ProfilePage,
+  [routerMeta.UserList.name]: UserListPage,
+  [routerMeta.AddBlog.name]: AddBlog,
 };
 
 function App() {
   const { reset } = useQueryErrorResetBoundary();
-
-  const renderWithProtectedRoute = (Component: React.ComponentType, routeName: string, routePath: string) => {
-    return (
-      <ProtectedRoute path={routePath}>
-        <Suspense fallback={<LoadingFallback />}>
-          <ErrorBoundary
-            onReset={reset}
-            fallbackRender={({ resetErrorBoundary }) => (
-              <ErrorFallback resetErrorBoundary={resetErrorBoundary} />
-            )}
-          >
-            <Component />
-          </ErrorBoundary>
-        </Suspense>
-      </ProtectedRoute>
-    );
-  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -72,10 +63,19 @@ function App() {
             name={routerMeta.HomePage.name}
             options={{ headerShown: false }}
           >
-            {(props) => renderWithProtectedRoute(
-              HomePage,
-              routerMeta.HomePage.name,
-              routerMeta.HomePage.path
+            {() => (
+              <Suspense fallback={<LoadingFallback />}>
+                <ErrorBoundary
+                  onReset={reset}
+                  fallbackRender={({ resetErrorBoundary }) => (
+                    <ErrorFallback resetErrorBoundary={resetErrorBoundary} />
+                  )}
+                >
+                  <ProtectedRoute path={routerMeta.HomePage.path}>
+                    <HomePage />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              </Suspense>
             )}
           </Stack.Screen>
 
@@ -84,10 +84,19 @@ function App() {
             name={routerMeta.LoginPage.name}
             options={{ headerShown: false }}
           >
-            {(props) => renderWithProtectedRoute(
-              LoginPage,
-              routerMeta.LoginPage.name,
-              routerMeta.LoginPage.path
+            {() => (
+              <Suspense fallback={<LoadingFallback />}>
+                <ErrorBoundary
+                  onReset={reset}
+                  fallbackRender={({ resetErrorBoundary }) => (
+                    <ErrorFallback resetErrorBoundary={resetErrorBoundary} />
+                  )}
+                >
+                  <ProtectedRoute path={routerMeta.LoginPage.path}>
+                    <LoginPage />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              </Suspense>
             )}
           </Stack.Screen>
 
@@ -110,10 +119,19 @@ function App() {
                   title: route.name,
                 }}
               >
-                {(props) => renderWithProtectedRoute(
-                  Component,
-                  route.name,
-                  route.path
+                {() => (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <ErrorBoundary
+                      onReset={reset}
+                      fallbackRender={({ resetErrorBoundary }) => (
+                        <ErrorFallback resetErrorBoundary={resetErrorBoundary} />
+                      )}
+                    >
+                      <ProtectedRoute path={route.path}>
+                        <Component />
+                      </ProtectedRoute>
+                    </ErrorBoundary>
+                  </Suspense>
                 )}
               </Stack.Screen>
             );

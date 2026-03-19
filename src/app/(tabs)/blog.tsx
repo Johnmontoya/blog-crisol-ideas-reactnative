@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function VerifyPage() {
+export default function BlogScreen() {
     return (
         <View>
-            <Text>VerifyPage</Text>
+            <Text>Blog</Text>
         </View>
     );
 }

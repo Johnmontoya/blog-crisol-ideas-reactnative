@@ -1,15 +1,18 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
-import { useAuth } from '@/context/UserContextProvider';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useGetUserIdQueries } from '@/queries/query/user.query';
+import { useAuthStore } from '@/store/auth';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function DashboardScreen() {
-  const { user } = useAuth();
+  const { userId } = useAuthStore();
+  const data = useGetUserIdQueries(userId)
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const user = data[0].data?.user;
 
   return (
     <ScrollView
