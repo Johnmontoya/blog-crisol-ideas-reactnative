@@ -1,21 +1,21 @@
+import { ACCESS_TOKEN_KEY } from '@/config/config';
 import { UserContext } from '@/context/UserContextProvider';
+import { useGetUserIdQueries } from '@/queries/query/user.query';
 import { useAuthStore } from '@/store/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
 import {
-    Animated,
     Modal,
     Pressable,
+    StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import routerMeta from '../types/routerMeta';
 import token from '../lib/token';
-import { ACCESS_TOKEN_KEY } from '@/config/config';
-import { StyleSheet } from 'react-native';
+import routerMeta from '../types/routerMeta';
 
 interface NavbarProps {
     title?: string;
@@ -24,24 +24,27 @@ interface NavbarProps {
 export default function DashboardNavbar({ title }: NavbarProps) {
     const { role, setIsLogin, setRole, setAuthToken } = useContext(UserContext);
     const logoutStore = useAuthStore(state => state.logout);
+    const { userId } = useAuthStore();
+    const data = useGetUserIdQueries(userId)
+    const user = data[0].data?.user;
     const navigation = useNavigation<any>();
     const [menuVisible, setMenuVisible] = useState(false);
 
     const handleLogout = async () => {
         try {
             setMenuVisible(false);
-            
+
             // 1. Limpiar almacenamiento persistente
             await token.removeToken(ACCESS_TOKEN_KEY);
-            
+
             // 2. Limpiar estado de Zustand
             logoutStore();
-            
+
             // 3. Limpiar contexto (esto activará automáticamente el ProtectedRoute para redirigir)
             setAuthToken(null);
             setRole(null);
             setIsLogin(false);
-            
+
             // No necesitamos navigation.reset aquí porque ProtectedRoute ya lo hace al detectar !isLogin
         } catch (error) {
             console.error("Error durante el logout:", error);
@@ -58,13 +61,13 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                     </View>
                 </View>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={styles.profileButton}
                     onPress={() => setMenuVisible(true)}
                 >
                     <View style={styles.avatar}>
                         <Text style={styles.avatarText}>
-                            {role === 'Admin' ? 'A' : 'U'}
+                            {user?.username?.charAt(0).toUpperCase() || 'U'}
                         </Text>
                     </View>
                     <Ionicons name="chevron-down" size={16} color="#64748b" />
@@ -78,16 +81,16 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                 animationType="fade"
                 onRequestClose={() => setMenuVisible(false)}
             >
-                <Pressable 
-                    style={styles.modalOverlay} 
+                <Pressable
+                    style={styles.modalOverlay}
                     onPress={() => setMenuVisible(false)}
                 >
                     <View style={styles.menuContainer}>
                         <View style={styles.menuHeader}>
                             <Text style={styles.userName}>Mi Cuenta</Text>
-                            <Text style={styles.userRole}>{role === 'Admin' ? 'Administrador' : 'Usuario'}</Text>
+                            <Text style={styles.userRole}>{user?.username}</Text>
                         </View>
-                        
+
                         <View style={styles.divider} />
 
                         {/* Opciones según el ROL */}
@@ -209,7 +212,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     menuContainer: {
-        marginTop: 110,
+        marginTop: 40,
         marginRight: 20,
         width: 200,
         backgroundColor: '#fff',

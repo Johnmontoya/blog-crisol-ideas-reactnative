@@ -1,14 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import MyTabsAdmin from "@/components/TabsMenuAdmin";
+import { StyleSheet, View } from "react-native";
 import DashboardNavbar from "../../components/DashboardNavbar";
 
 export default function AdminDashboardPage() {
     return (
         <View style={styles.container}>
             <DashboardNavbar title="Admin Panel" />
-            <View style={styles.content}>
-                <Text style={styles.text}>Admin Dashboard</Text>
-                <Text style={styles.subtext}>Gestiona los usuarios y el contenido aquí.</Text>
-            </View>
+            <MyTabsAdmin />
         </View>
     );
 }
