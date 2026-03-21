@@ -1,9 +1,9 @@
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCreateBlogMutation, useGenerateAIMutation } from '@/queries/mutation/blogMutation';
 import { useAuthStore } from '@/store/auth';
+import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
 import { Camera, CheckCircle, FileText, Layout, Sparkles, Tag, Type, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
@@ -15,7 +15,7 @@ export default function AddBlogScreen() {
     const [subTitle, setSubTitle] = useState('');
     const [category, setCategory] = useState('');
     const [description, setDescription] = useState('');
-    const [image, setImage] = useState<string | null>(null);
+    const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [successModalVisible, setSuccessModalVisible] = useState(false);
 
     // Mutaciones
@@ -31,7 +31,7 @@ export default function AddBlogScreen() {
         });
 
         if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            setImage(result.assets[0]);
         }
     };
 
@@ -79,7 +79,25 @@ export default function AddBlogScreen() {
 
         const formData = new FormData();
         formData.append("blog", JSON.stringify(Data));
-        formData.append("image", image!);
+        
+        if (image) {
+            // Manejar diferencias entre Web y Mobile
+            if (image.file) {
+                // Para WEB: Usamos el objeto File nativo
+                formData.append("image", image.file);
+            } else {
+                // Para MOBILE (iOS/Android): Usamos el objeto simulado con URI
+                const fileName = image.uri.split('/').pop() || 'photo.jpg';
+                const fileType = image.mimeType || 'image/jpeg';
+                
+                // @ts-ignore
+                formData.append("image", {
+                    uri: image.uri,
+                    name: fileName,
+                    type: fileType,
+                });
+            }
+        }
 
         createBlog(formData, {
             onSuccess: () => {
@@ -129,7 +147,7 @@ export default function AddBlogScreen() {
                     {image ? (
                         <View className="w-full h-48 rounded-[32px] overflow-hidden relative shadow-lg shadow-black/10">
                             <Image
-                                source={{ uri: image }}
+                                source={{ uri: image.uri }}
                                 style={{ width: '100%', height: '100%' }}
                                 contentFit="cover"
                             />
@@ -258,7 +276,7 @@ export default function AddBlogScreen() {
                             </Text>
                         </View>
 
-                        <Pressable 
+                        <Pressable
                             onPress={() => setSuccessModalVisible(false)}
                             className="w-full py-4 rounded-2xl bg-violet-600 active:opacity-90 shadow-lg shadow-violet-500/30"
                         >
