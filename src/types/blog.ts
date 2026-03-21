@@ -41,7 +41,7 @@ export interface IDashboardResponse {
     Blogs: IDashboard
 }
 
-interface IResponse {
+export interface IResponse {
     message: string;
     valid: string;
     content: string;
