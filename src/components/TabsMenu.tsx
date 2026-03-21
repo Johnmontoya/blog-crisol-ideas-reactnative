@@ -1,4 +1,4 @@
-import BlogScreen from '@/app/(tabs)/blog';
+import BlogScreen from '@/app/(tabs)/addblog';
 import DashboardScreen from '@/app/(tabs)/dashboard';
 import ListBlogScreen from '@/app/(tabs)/listblog';
 import ProfileScreen from '@/app/(tabs)/profile';

@@ -1,5 +1,5 @@
+import AddBlogScreen from '@/app/(tabs)/addblog';
 import AddNewsScreen from '@/app/(tabs)/addnews';
-import BlogScreen from '@/app/(tabs)/blog';
 import CommentScreen from '@/app/(tabs)/comment';
 import DashboardScreen from '@/app/(tabs)/dashboard';
 import ListBlogScreen from '@/app/(tabs)/listblog';
@@ -45,8 +45,8 @@ export default function MyTabsAdmin() {
                 options={{ title: 'News List' }}
             />
             <Tab.Screen
-                name="Blog"
-                component={BlogScreen}
+                name="AddBlog"
+                component={AddBlogScreen}
                 options={{ title: 'Add Blog' }}
             />
             <Tab.Screen
