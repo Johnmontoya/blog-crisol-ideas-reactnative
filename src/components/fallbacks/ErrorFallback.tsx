@@ -1,36 +1,49 @@
-import { useNavigation } from "@react-navigation/native";
+import AnimatedPressable from '@/components/ui/AnimatedPressable';
+import { AlertTriangle, RotateCcw } from 'lucide-react-native';
+import React from 'react';
+import { Text, useColorScheme, View } from 'react-native';
 
 interface IErrorFallbackProps {
     resetErrorBoundary: (...args: unknown[]) => void;
 }
 
 const ErrorFallback = ({ resetErrorBoundary }: IErrorFallbackProps) => {
-    const navigation = useNavigation();
+    const colorScheme = useColorScheme() ?? 'light';
 
     return (
-        <div style={{ textAlign: "center" }}>
-            <h2>Hubo un problema en la solicitud!</h2>
-            <div className="flex flex-col items-center justify-around border border-gray-200 rounded-2xl m-2 py-20 max-w-5xl w-full bg-white">
-                <h2 className="md:text-4xl/14 text-2xl font-bold bg-linear-to-r from-pink-500 to-yellow-500 text-transparent bg-clip-text">Opps!...</h2>
-                <p className="mt-4 text-slate-500 max-w-xl text-center">Hubo un problema en la solicitud!</p>
-                <div className="flex items-center gap-4 mt-6 text-sm">
-                    <button type="button" onClick={() => resetErrorBoundary()} className="bg-indigo-500 hover:bg-indigo-600 transition-all cursor-pointer px-8 py-3 text-white font-medium rounded-full active:scale-95">
-                        Intentar de nuevo
-                    </button>
-                    <button type="button" onClick={() => {
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: 'Home' }],
-                        });
-                    }} className="group flex items-center gap-2 px-8 py-3 cursor-pointer font-medium border border-gray-200 rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95">
-                        Go Home
-                        <svg className="mt-1 group-hover:translate-x-1 transition-all" width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 5.5h13.092M8.949 1l5.143 4.5L8.949 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+        <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212] p-6">
+            <View className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-3xl p-10 w-full max-w-sm shadow-2xl items-center">
+                <View className="w-20 h-20 bg-rose-50 dark:bg-rose-900/10 rounded-full items-center justify-center mb-6">
+                    <AlertTriangle size={40} color="#ef4444" />
+                </View>
+
+                <Text
+                    style={{ fontFamily: 'PlayfairDisplay_700Bold' }}
+                    className="text-4xl text-[#1a1a1a] dark:text-[#f3f4f6] text-center mb-3"
+                >
+                    Opps!...
+                </Text>
+
+                <Text
+                    style={{ fontFamily: 'Inter_400Regular' }}
+                    className="text-[#64748b] dark:text-[#9ca3af] text-center text-sm leading-6 mb-10 px-2"
+                >
+                    Hubo un problema inesperado en la solicitud. ¿Te gustaría intentar de nuevo?
+                </Text>
+
+                <View className="w-full gap-4">
+                    <AnimatedPressable
+                        onPress={() => resetErrorBoundary()}
+                        className="bg-black dark:bg-white h-14 rounded-2xl flex-row items-center justify-center active:opacity-90"
+                    >
+                        <RotateCcw size={18} color={colorScheme === 'dark' ? '#000' : '#fff'} strokeWidth={2} />
+                        <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-white dark:text-black text-base ml-2">
+                            Intentar de nuevo
+                        </Text>
+                    </AnimatedPressable>
+                </View>
+            </View>
+        </View>
     );
 };
 

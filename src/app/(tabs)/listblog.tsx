@@ -3,20 +3,33 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useDeleteBlogMutation, useToggleBlogMutation } from '@/queries/mutation/blogMutation';
 import { useGetOwnBlogQueries } from '@/queries/query/blog.query';
 import { useAuthStore } from '@/store/auth';
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    useFonts as useInterFonts
+} from '@expo-google-fonts/inter';
+import {
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_700Bold,
+    useFonts as usePlayfairFonts
+} from '@expo-google-fonts/playfair-display';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
-import { AlertTriangle, BookOpen, CheckCircle, Eye, EyeOff, Trash2 } from 'lucide-react-native';
+import { AlertTriangle, BookOpen, CheckCircle, EyeOff, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function ListBlogScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const { userId } = useAuthStore();
     const queryClient = useQueryClient();
-    
+
     // Fetch blogs
     const { data: blogsData, isLoading, isError, refetch } = useGetOwnBlogQueries(userId);
-    const blogs = blogsData?.blogs || [];
+    const blogs = blogsData?.blogs || (Array.isArray(blogsData) ? blogsData : []);
 
     // Estado para el modal de confirmación
     const [modalVisible, setModalVisible] = useState(false);
@@ -26,30 +39,50 @@ export default function ListBlogScreen() {
     const { mutate: deleteBlog, isPending: isDeleting } = useDeleteBlogMutation();
     const { mutate: toggleStatus, isPending: isToggling } = useToggleBlogMutation();
 
+    const [playfairLoaded] = usePlayfairFonts({
+        PlayfairDisplay_400Regular,
+        PlayfairDisplay_700Bold,
+    });
+
+    const [interLoaded] = useInterFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
     const openDeleteModal = (blogId: string, title: string) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } catch (e) { }
         setSelectedBlog({ id: blogId, title });
         setModalVisible(true);
     };
 
     const confirmDelete = () => {
         if (!selectedBlog) return;
-        
+
         deleteBlog({ id: selectedBlog.id }, {
             onSuccess: () => {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                try {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                } catch (e) { }
                 queryClient.invalidateQueries({ queryKey: [BLOG_DATA, userId] });
                 setModalVisible(false);
                 setSelectedBlog(null);
             },
             onError: () => {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                try {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                } catch (e) { }
             }
         });
     };
 
     const handleToggleStatus = (blogId: string) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (e) { }
         toggleStatus({ id: blogId }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: [BLOG_DATA, userId] });
@@ -57,130 +90,158 @@ export default function ListBlogScreen() {
         });
     };
 
-    if (isLoading) {
+    if (!playfairLoaded || !interLoaded || isLoading) {
         return (
-            <View className="flex-1 justify-center items-center bg-[#f8f9fa] dark:bg-[#0a0a0a]">
-                <ActivityIndicator size="large" color="#6366f1" />
-                <Text className="mt-4 text-[#64748b] dark:text-[#9ca3af]">Cargando tus publicaciones...</Text>
+            <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212]">
+                <ActivityIndicator size="large" color="#000" />
+                {!isLoading && <Text className="mt-4 text-[#666]">Cargando fuentes...</Text>}
             </View>
         );
     }
 
     if (isError) {
         return (
-            <View className="flex-1 justify-center items-center bg-[#f8f9fa] dark:bg-[#0a0a0a] p-10">
+            <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212] p-10">
                 <AlertTriangle size={48} color="#ef4444" />
                 <Text className="mt-4 text-center text-[#ef4444] font-bold text-lg">Error al cargar blogs</Text>
-                <Pressable 
+                <Pressable
                     onPress={() => refetch()}
-                    className="mt-6 px-6 py-3 bg-violet-600 rounded-xl"
+                    className="mt-6 px-8 py-4 bg-black dark:bg-white rounded-2xl shadow-lg"
                 >
-                    <Text className="text-white font-bold">Reintentar</Text>
+                    <Text className="text-white dark:text-black font-bold">Reintentar</Text>
                 </Pressable>
             </View>
         );
     }
 
     return (
-        <View className="flex-1 bg-[#f8f9fa] dark:bg-[#0a0a0a]">
-            <ScrollView 
+        <View className="flex-1 bg-[#fdfdfc] dark:bg-[#121212]">
+            <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ padding: 20 }}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 40, paddingBottom: 60 }}
             >
-                <View className="mb-6 flex-row justify-between items-center">
-                    <View>
-                        <Text className="text-2xl font-bold text-[#111827] dark:text-[#f3f4f6] font-[PlayfairDisplay_700Bold]">
-                            Mis Publicaciones
-                        </Text>
-                        <Text className="text-sm text-[#64748b] dark:text-[#9ca3af] mt-1">
-                            Gestiona y edita tus historias
-                        </Text>
-                    </View>
-                    { (isDeleting || isToggling) && <ActivityIndicator size="small" color="#6366f1" /> }
-                </View>
+                {/* Header Section */}
+                <Animated.View
+                    entering={FadeInUp.duration(600).delay(100)}
+                    className="mb-10"
+                >
+                    <Text
+                        style={{ fontFamily: 'PlayfairDisplay_700Bold' }}
+                        className="text-6xl text-[#1a1a1a] dark:text-[#f3f4f6] tracking-tighter"
+                    >
+                        Mis Blogs.
+                    </Text>
+                    <Text
+                        style={{ fontFamily: 'Inter_400Regular' }}
+                        className="text-lg text-[#666] dark:text-[#999] mt-3"
+                    >
+                        Gestiona, edita y controla la visibilidad de tus publicaciones de manera eficiente.
+                    </Text>
+                    <View className="h-[1px] bg-[#d1d1d1] dark:bg-[#333] w-full mt-8" />
+                </Animated.View>
 
-                {/* Table Header */}
-                <View className="flex-row bg-[#6366f1] p-4 rounded-t-2xl">
-                    <View className="flex-[2]">
-                        <Text className="text-white font-bold text-xs uppercase tracking-wider">Publicación</Text>
-                    </View>
-                    <View className="flex-[1] items-center">
-                        <Text className="text-white font-bold text-xs uppercase tracking-wider">Estado</Text>
-                    </View>
-                    <View className="flex-[1] items-end">
-                        <Text className="text-white font-bold text-xs uppercase tracking-wider">Acciones</Text>
-                    </View>
-                </View>
-
-                {/* Table Body */}
-                <View className="bg-white dark:bg-[#1a1a1a] rounded-b-2xl shadow-sm overflow-hidden border-x border-b border-[#eee] dark:border-[#333]">
-                    {blogs.length > 0 ? (
-                        blogs.map((item: any, index: number) => (
-                            <View 
-                                key={item._id || index}
-                                className={`flex-row p-4 items-center ${
-                                    index !== blogs.length - 1 ? 'border-b border-[#f1f5f9] dark:border-[#222]' : ''
-                                }`}
-                            >
-                                {/* Title & Category */}
-                                <View className="flex-[2] flex-row items-center gap-3">
-                                    <View className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/30 items-center justify-center">
-                                        <BookOpen size={16} color="#7c3aed" />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text className="font-semibold text-[#1e293b] dark:text-[#f3f4f6]" numberOfLines={1}>
-                                            {item.title}
-                                        </Text>
-                                        <Text className="text-[10px] text-[#64748b]" numberOfLines={1}>
-                                            {item.category}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                {/* Publish Status */}
-                                <View className="flex-[1] items-center">
-                                    {item.isPublished ? (
-                                        <View className="flex-row items-center bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full border border-emerald-100 dark:border-emerald-900/30">
-                                            <CheckCircle size={12} color="#10b981" />
-                                            <Text className="text-[10px] text-emerald-600 font-bold ml-1">Público</Text>
-                                        </View>
-                                    ) : (
-                                        <View className="flex-row items-center bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full border border-amber-100 dark:border-amber-900/30">
-                                            <EyeOff size={12} color="#d97706" />
-                                            <Text className="text-[10px] text-amber-600 font-bold ml-1">Oculto</Text>
-                                        </View>
-                                    )}
-                                </View>
-
-                                {/* Actions Column */}
-                                <View className="flex-[1] flex-row justify-end gap-2">
-                                    <Pressable 
-                                        onPress={() => handleToggleStatus(item._id)}
-                                        className={`p-2 rounded-lg active:opacity-60 ${
-                                            item.isPublished ? 'bg-amber-50 dark:bg-amber-900/10' : 'bg-emerald-50 dark:bg-emerald-900/10'
-                                        }`}
-                                    >
-                                        {item.isPublished ? <EyeOff size={16} color="#d97706" /> : <Eye size={16} color="#10b981" />}
-                                    </Pressable>
-                                    <Pressable 
-                                        onPress={() => openDeleteModal(item._id, item.title)}
-                                        className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg active:opacity-60"
-                                    >
-                                        <Trash2 size={16} color="#ef4444" />
-                                    </Pressable>
-                                </View>
+                {/* Table Horizontal view */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <View className="min-w-[800]">
+                        {/* Table Header Labels */}
+                        <View className="flex-row border-b border-gray-100 dark:border-gray-800 pb-4 mb-4 px-4">
+                            <View className="w-12">
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#64748b] text-[10px] tracking-widest uppercase">#</Text>
                             </View>
-                        ))
-                    ) : (
-                        <View className="p-10 items-center">
-                            <BookOpen size={40} color="#cbd5e1" />
-                            <Text className="mt-2 text-[#94a3b8]">No tienes publicaciones aún.</Text>
+                            <View className="flex-[3] w-24">
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#64748b] text-[10px] tracking-widest uppercase">Publicación</Text>
+                            </View>
+                            <View className="flex-[1.5] w-24 text-left">
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#64748b] text-[10px] tracking-widest uppercase">Categoría</Text>
+                            </View>
+                            <View className="flex-[1.2] w-24 text-left">
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#64748b] text-[10px] tracking-widest uppercase">Estado</Text>
+                            </View>
+                            <View className="flex-[1] w-24 text-left">
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#64748b] text-[10px] tracking-widest uppercase">Acciones</Text>
+                            </View>
                         </View>
-                    )}
-                </View>
+
+                        {/* Table Items Container */}
+                        <View className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 shadow-sm rounded-3xl overflow-hidden">
+                            {blogs.length > 0 ? (
+                                blogs.map((item: any, index: number) => (
+                                    <Animated.View
+                                        key={item._id || index}
+                                        entering={FadeInDown.duration(500).delay(200 + index * 50)}
+                                        className="flex-row p-5 items-center border-b border-gray-50 dark:border-gray-900 last:border-0"
+                                    >
+                                        <View className="w-12">
+                                            <Text style={{ fontFamily: 'PlayfairDisplay_700Bold' }} className="text-xl text-[#c1c1c1] dark:text-[#444]">
+                                                {String(index + 1).padStart(2, '0')}
+                                            </Text>
+                                        </View>
+
+                                        {/* Blog Title & Icon */}
+                                        <View className="flex-[3] w-24 flex-row items-center gap-4">
+                                            <View className="w-12 h-12 rounded-2xl bg-[#f8fafc] dark:bg-[#121212] border border-gray-100 dark:border-gray-800 items-center justify-center">
+                                                <BookOpen size={20} color="#6366f1" />
+                                            </View>
+                                            <View className="flex-1">
+                                                <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-sm text-[#1a1a1a] dark:text-[#f3f4f6]" numberOfLines={2}>
+                                                    {item.title}
+                                                </Text>
+                                            </View>
+                                        </View>
+
+                                        {/* Category Label */}
+                                        <View className="flex-[1.5] w-24 text-left">
+                                            <View className="bg-[#f1f5f9] dark:bg-[#2a2a2a] px-3 py-1.5 rounded-full self-start">
+                                                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[10px] text-[#64748b] dark:text-[#9ca3af] uppercase tracking-tighter">
+                                                    {item.category || 'Sin categoría'}
+                                                </Text>
+                                            </View>
+                                        </View>
+
+                                        {/* Visibility Status */}
+                                        <View className="flex-[1.2] w-24 text-left">
+                                            <Pressable
+                                                onPress={() => handleToggleStatus(item._id)}
+                                                className={`px-4 py-2 rounded-xl border ${item.isPublished
+                                                    ? 'border-emerald-200 bg-emerald-50/20'
+                                                    : 'border-amber-100 bg-amber-50/10'
+                                                    }`}
+                                            >
+                                                <View className="flex-row items-center gap-1.5">
+                                                    {item.isPublished
+                                                        ? <CheckCircle size={12} color="#10b981" />
+                                                        : <EyeOff size={12} color="#d97706" />
+                                                    }
+                                                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className={`text-[10px] uppercase ${item.isPublished ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                        {item.isPublished ? 'Público' : 'Oculto'}
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+
+                                        {/* Actions */}
+                                        <View className="flex-[1] flex-row justify-end items-center">
+                                            <Pressable
+                                                onPress={() => openDeleteModal(item._id, item.title)}
+                                                className="w-10 h-10 bg-rose-50 dark:bg-rose-900/10 rounded-full items-center justify-center active:opacity-60"
+                                            >
+                                                <Trash2 size={18} color="#ef4444" strokeWidth={1.5} />
+                                            </Pressable>
+                                        </View>
+                                    </Animated.View>
+                                ))
+                            ) : (
+                                <View className="p-20 items-center">
+                                    <BookOpen size={48} color="#cbd5e1" strokeWidth={1} />
+                                    <Text style={{ fontFamily: 'Inter_500Medium' }} className="mt-4 text-[#94a3b8]">No tienes publicaciones aún.</Text>
+                                </View>
+                            )}
+                        </View>
+                    </View>
+                </ScrollView>
             </ScrollView>
 
-            {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+            {/* CONFIRMATION MODAL */}
             <Modal
                 transparent={true}
                 visible={modalVisible}
@@ -188,36 +249,36 @@ export default function ListBlogScreen() {
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View className="flex-1 justify-center items-center bg-black/60 px-6">
-                    <View className="bg-white dark:bg-[#1a1a1a] w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-white/10">
-                        <View className="items-center mb-6">
-                            <View className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full items-center justify-center mb-4">
-                                <AlertTriangle size={32} color="#ef4444" />
+                    <View className="bg-white dark:bg-[#1a1a1a] w-full max-w-md rounded-[40px] p-8 shadow-2xl border border-white/10">
+                        <View className="items-center mb-8">
+                            <View className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full items-center justify-center mb-6">
+                                <AlertTriangle size={36} color="#ef4444" />
                             </View>
-                            <Text className="text-xl font-bold text-[#111827] dark:text-[#f3f4f6] text-center">
+                            <Text style={{ fontFamily: 'PlayfairDisplay_700Bold' }} className="text-2xl text-[#111827] dark:text-[#f3f4f6] text-center">
                                 ¿Eliminar publicación?
                             </Text>
-                            <Text className="text-[#64748b] dark:text-[#9ca3af] text-center mt-2">
-                                Estás a punto de borrar "<Text className="font-bold text-[#ef4444]">{selectedBlog?.title}</Text>". Esta acción es permanente.
+                            <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[#64748b] dark:text-[#9ca3af] text-center mt-3 leading-6 px-4">
+                                Esta acción eliminará permanentemente "<Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[#ef4444]">{selectedBlog?.title}</Text>". Los datos no se podrán recuperar.
                             </Text>
                         </View>
 
-                        <View className="flex-row gap-3">
-                            <Pressable 
+                        <View className="flex-row gap-4">
+                            <Pressable
                                 onPress={() => setModalVisible(false)}
-                                className="flex-1 py-4 rounded-2xl bg-gray-100 dark:bg-[#2a2a2a] active:opacity-70"
+                                className="flex-1 py-5 rounded-[22px] bg-gray-100 dark:bg-[#2a2a2a] active:opacity-70"
                             >
-                                <Text className="text-center font-bold text-[#64748b] dark:text-[#9ca3af]">Cancelar</Text>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-center text-[#64748b] dark:text-[#9ca3af]">Cancelar</Text>
                             </Pressable>
-                            
-                            <Pressable 
+
+                            <Pressable
                                 onPress={confirmDelete}
                                 disabled={isDeleting}
-                                className="flex-1 py-4 rounded-2xl bg-[#ef4444] active:opacity-90 shadow-lg shadow-red-500/30"
+                                className="flex-1 py-5 rounded-[22px] bg-[#ef4444] active:opacity-90 shadow-xl shadow-red-500/20"
                             >
                                 {isDeleting ? (
                                     <ActivityIndicator size="small" color="#fff" />
                                 ) : (
-                                    <Text className="text-center font-bold text-white">Eliminar</Text>
+                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-center text-white">Eliminar</Text>
                                 )}
                             </Pressable>
                         </View>

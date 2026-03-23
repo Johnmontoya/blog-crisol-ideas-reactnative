@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import routerMeta from '../../types/routerMeta';
+import AnimatedPressable from '../../components/ui/AnimatedPressable';
 
 const { width } = Dimensions.get('window');
 
@@ -62,9 +63,9 @@ const HomePage = () => {
                         className="flex-row justify-between items-center mb-5"
                     >
                         <Text className="text-[22px] font-bold text-slate-800">Categorías</Text>
-                        <Pressable className="active:opacity-60">
+                        <AnimatedPressable scaleTo={0.9}>
                             <Text className="text-indigo-500 font-semibold">Ver todas</Text>
-                        </Pressable>
+                        </AnimatedPressable>
                     </Animated.View>
 
                     <ScrollView 
@@ -77,10 +78,13 @@ const HomePage = () => {
                                 key={cat.id}
                                 entering={FadeInDown.delay(700 + index * 100).duration(600)}
                             >
-                                <Pressable className="bg-white p-5 rounded-[20px] mr-4 items-center w-30 shadow-sm shadow-black active:scale-[0.97] active:bg-slate-50">
+                                <AnimatedPressable 
+                                    className="bg-white p-5 rounded-[20px] mr-4 items-center w-30 shadow-sm shadow-black" 
+                                    scaleTo={0.92}
+                                >
                                     <Text className="text-[32px] mb-2.5">{cat.icon}</Text>
                                     <Text className="text-sm font-semibold text-slate-500">{cat.name}</Text>
-                                </Pressable>
+                                </AnimatedPressable>
                             </Animated.View>
                         ))}
                     </ScrollView>
@@ -94,8 +98,9 @@ const HomePage = () => {
                             Crea tu cuenta hoy y comienza a compartir tus propias ideas con el mundo.
                         </Text>
                         
-                        <Pressable 
-                            className="w-full h-14 rounded-2xl overflow-hidden active:scale-[0.98] active:opacity-90"
+                        <AnimatedPressable 
+                            className="w-full h-14 rounded-2xl overflow-hidden"
+                            scaleTo={0.96}
                             onPress={() => navigation.navigate(routerMeta.LoginPage.name)}
                         >
                             <LinearGradient
@@ -106,7 +111,7 @@ const HomePage = () => {
                             >
                                 <Text className="text-white text-lg font-bold">Comenzar Ahora</Text>
                             </LinearGradient>
-                        </Pressable>
+                        </AnimatedPressable>
                     </Animated.View>
                 </SafeAreaView>
                 <View style={{ height: 40 }} />
@@ -114,7 +119,5 @@ const HomePage = () => {
         </View>
     );
 };
-
-
 
 export default HomePage;

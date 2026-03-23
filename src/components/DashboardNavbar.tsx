@@ -7,15 +7,17 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
 import {
     Modal,
+    Platform,
     Pressable,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from 'react-native';
+import Animated, { SlideInRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import token from '../lib/token';
 import routerMeta from '../types/routerMeta';
+import AnimatedPressable from './ui/AnimatedPressable';
 
 interface NavbarProps {
     title?: string;
@@ -40,12 +42,11 @@ export default function DashboardNavbar({ title }: NavbarProps) {
             // 2. Limpiar estado de Zustand
             logoutStore();
 
-            // 3. Limpiar contexto (esto activará automáticamente el ProtectedRoute para redirigir)
+            // 3. Limpiar contexto
             setAuthToken(null);
             setRole(null);
             setIsLogin(false);
 
-            // No necesitamos navigation.reset aquí porque ProtectedRoute ya lo hace al detectar !isLogin
         } catch (error) {
             console.error("Error durante el logout:", error);
         }
@@ -61,7 +62,7 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                     </View>
                 </View>
 
-                <TouchableOpacity
+                <AnimatedPressable
                     style={styles.profileButton}
                     onPress={() => setMenuVisible(true)}
                 >
@@ -71,7 +72,7 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         </Text>
                     </View>
                     <Ionicons name="chevron-down" size={16} color="#64748b" />
-                </TouchableOpacity>
+                </AnimatedPressable>
             </View>
 
             {/* Modal para el Menú Desplegable */}
@@ -85,7 +86,10 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                     style={styles.modalOverlay}
                     onPress={() => setMenuVisible(false)}
                 >
-                    <View style={styles.menuContainer}>
+                    <Animated.View 
+                        entering={SlideInRight.springify().damping(15).stiffness(150)}
+                        style={styles.menuContainer}
+                    >
                         <View style={styles.menuHeader}>
                             <Text style={styles.userName}>Mi Cuenta</Text>
                             <Text style={styles.userRole}>{user?.username}</Text>
@@ -96,7 +100,7 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         {/* Opciones según el ROL */}
                         {role === 'Admin' && (
                             <>
-                                <TouchableOpacity style={styles.menuItem} onPress={() => {
+                                <AnimatedPressable style={styles.menuItem} onPress={() => {
                                     setMenuVisible(false);
                                     setTimeout(() => {
                                         navigation.navigate(routerMeta.UserList.name);
@@ -104,9 +108,9 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                                 }}>
                                     <Ionicons name="people-outline" size={20} color="#1e293b" />
                                     <Text style={styles.menuItemText}>Usuarios</Text>
-                                </TouchableOpacity>
+                                </AnimatedPressable>
 
-                                <TouchableOpacity style={styles.menuItem} onPress={() => {
+                                <AnimatedPressable style={styles.menuItem} onPress={() => {
                                     setMenuVisible(false);
                                     setTimeout(() => {
                                         navigation.navigate(routerMeta.AddBlog.name);
@@ -114,11 +118,11 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                                 }}>
                                     <Ionicons name="add-circle-outline" size={20} color="#1e293b" />
                                     <Text style={styles.menuItemText}>Agregar Blog</Text>
-                                </TouchableOpacity>
+                                </AnimatedPressable>
                             </>
                         )}
 
-                        <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        <AnimatedPressable style={styles.menuItem} onPress={() => {
                             setMenuVisible(false);
                             setTimeout(() => {
                                 navigation.navigate(routerMeta.ProfilePage.name);
@@ -126,9 +130,9 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         }}>
                             <Ionicons name="person-outline" size={20} color="#1e293b" />
                             <Text style={styles.menuItemText}>Perfil</Text>
-                        </TouchableOpacity>
+                        </AnimatedPressable>
 
-                        <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        <AnimatedPressable style={styles.menuItem} onPress={() => {
                             setMenuVisible(false);
                             setTimeout(() => {
                                 navigation.navigate(routerMeta.HomePage.name);
@@ -136,15 +140,15 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         }}>
                             <Ionicons name="home-outline" size={20} color="#1e293b" />
                             <Text style={styles.menuItemText}>Ir al Inicio</Text>
-                        </TouchableOpacity>
+                        </AnimatedPressable>
 
                         <View style={styles.divider} />
 
-                        <TouchableOpacity style={[styles.menuItem, styles.logoutItem]} onPress={handleLogout}>
+                        <AnimatedPressable style={[styles.menuItem, styles.logoutItem]} onPress={handleLogout}>
                             <Ionicons name="log-out-outline" size={20} color="#ef4444" />
                             <Text style={[styles.menuItemText, styles.logoutText]}>Cerrar Sesión</Text>
-                        </TouchableOpacity>
-                    </View>
+                        </AnimatedPressable>
+                    </Animated.View>
                 </Pressable>
             </Modal>
         </SafeAreaView>
@@ -153,9 +157,20 @@ export default function DashboardNavbar({ title }: NavbarProps) {
 
 const styles = StyleSheet.create({
     safeArea: {
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
     },
     container: {
         height: 60,
@@ -170,71 +185,91 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     brandTitle: {
-        fontSize: 20,
-        fontWeight: '700',
+        fontSize: 22,
+        fontWeight: '800',
         color: '#1e293b',
+        letterSpacing: -0.5,
     },
     roleBadge: {
         backgroundColor: '#e0f2fe',
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
     },
     roleText: {
-        fontSize: 11,
-        fontWeight: '600',
+        fontSize: 12,
+        fontWeight: '700',
         color: '#0369a1',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     profileButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
         padding: 4,
     },
     avatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#6366f1',
         justifyContent: 'center',
         alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#6366f1',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
     },
     avatarText: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: '700',
-        fontSize: 14,
+        fontSize: 16,
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: 'rgba(15, 23, 42, 0.4)',
         justifyContent: 'flex-start',
         alignItems: 'flex-end',
     },
     menuContainer: {
-        marginTop: 40,
+        marginTop: Platform.OS === 'ios' ? 50 : 20,
         marginRight: 20,
-        width: 200,
-        backgroundColor: '#fff',
+        width: 220,
+        backgroundColor: '#ffffff',
         borderRadius: 16,
         paddingVertical: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 10,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.15,
+                shadowRadius: 24,
+            },
+            android: {
+                elevation: 12,
+            },
+        }),
     },
     menuHeader: {
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 14,
     },
     userName: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: '#1e293b',
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#0f172a',
     },
     userRole: {
-        fontSize: 12,
+        fontSize: 13,
+        fontWeight: '500',
         color: '#64748b',
         marginTop: 2,
     },
@@ -248,15 +283,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 14,
     },
     menuItemText: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#1e293b',
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#334155',
     },
     logoutItem: {
-        marginTop: 4,
+        marginTop: 2,
     },
     logoutText: {
         color: '#ef4444',

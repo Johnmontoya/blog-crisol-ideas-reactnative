@@ -52,7 +52,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserContextProvider>
-        {/* Eliminamos NavigationContainer porque Expo Router ya provee uno en la raíz */}
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
