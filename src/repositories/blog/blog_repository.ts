@@ -53,7 +53,6 @@ export const deleteBlog = async ({ id }: IBlog): Promise<AxiosResponse<string>> 
 }
 
 export const addBlog = async (data: any): Promise<AxiosResponse<IResponse>> => {
-    console.log(data);
     return await apiClient<IResponse>({
         method: 'post',
         url: `/api/v1/blog/add`,

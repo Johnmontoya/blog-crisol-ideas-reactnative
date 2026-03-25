@@ -86,7 +86,7 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                     style={styles.modalOverlay}
                     onPress={() => setMenuVisible(false)}
                 >
-                    <Animated.View 
+                    <Animated.View
                         entering={SlideInRight.springify().damping(15).stiffness(150)}
                         style={styles.menuContainer}
                     >
@@ -98,39 +98,6 @@ export default function DashboardNavbar({ title }: NavbarProps) {
                         <View style={styles.divider} />
 
                         {/* Opciones según el ROL */}
-                        {role === 'Admin' && (
-                            <>
-                                <AnimatedPressable style={styles.menuItem} onPress={() => {
-                                    setMenuVisible(false);
-                                    setTimeout(() => {
-                                        navigation.navigate(routerMeta.UserList.name);
-                                    }, 100);
-                                }}>
-                                    <Ionicons name="people-outline" size={20} color="#1e293b" />
-                                    <Text style={styles.menuItemText}>Usuarios</Text>
-                                </AnimatedPressable>
-
-                                <AnimatedPressable style={styles.menuItem} onPress={() => {
-                                    setMenuVisible(false);
-                                    setTimeout(() => {
-                                        navigation.navigate(routerMeta.AddBlog.name);
-                                    }, 100);
-                                }}>
-                                    <Ionicons name="add-circle-outline" size={20} color="#1e293b" />
-                                    <Text style={styles.menuItemText}>Agregar Blog</Text>
-                                </AnimatedPressable>
-                            </>
-                        )}
-
-                        <AnimatedPressable style={styles.menuItem} onPress={() => {
-                            setMenuVisible(false);
-                            setTimeout(() => {
-                                navigation.navigate(routerMeta.ProfilePage.name);
-                            }, 100);
-                        }}>
-                            <Ionicons name="person-outline" size={20} color="#1e293b" />
-                            <Text style={styles.menuItemText}>Perfil</Text>
-                        </AnimatedPressable>
 
                         <AnimatedPressable style={styles.menuItem} onPress={() => {
                             setMenuVisible(false);

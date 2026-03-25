@@ -19,7 +19,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, CheckCircle, FileText, Image as ImageIcon, Sparkles, Tag, Type, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, TextInput, View, Image as RNImage } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function AddBlogScreen() {
@@ -213,10 +213,10 @@ export default function AddBlogScreen() {
                         <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-4 ml-1">Portada del Artículo</Text>
                         {image ? (
                             <View className="w-full h-56 rounded-[32px] overflow-hidden relative shadow-xl shadow-black/5">
-                                <Image
+                                <RNImage
                                     source={{ uri: image.uri }}
                                     className="w-full h-full"
-                                    contentFit="cover"
+                                    resizeMode="cover"
                                 />
                                 <AnimatedPressable
                                     onPress={() => setImage(null)}
