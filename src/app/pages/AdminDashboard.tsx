@@ -14,7 +14,7 @@ export default function AdminDashboardPage() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#fdfdfc',
     },
     content: {
         flex: 1,

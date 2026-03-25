@@ -18,16 +18,16 @@ import {
     useFonts as usePlayfairFonts
 } from '@expo-google-fonts/playfair-display';
 import { useNavigation } from '@react-navigation/native';
-import { CheckCircle2, ChevronRight, LayoutGrid, Plane, Smartphone, TrendingUp } from 'lucide-react-native';
+import { Bitcoin, CheckCircle2, ChevronRight, LayoutGrid, Newspaper, Plane, Rocket, Smartphone, SquareChartGantt, TrendingUp, Volleyball } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
     Dimensions,
+    Pressable,
+    Image as RNImage,
     ScrollView,
     Text,
-    View,
-    Pressable,
-    Image as RNImage
+    View
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import routerMeta from '../../types/routerMeta';
@@ -81,9 +81,14 @@ const HomePage = () => {
 
     const categories = [
         { id: 'all', name: 'TODO', icon: <LayoutGrid size={14} color="#666" /> },
-        { id: 'tech', name: 'TECNOLOGÍA', icon: <Smartphone size={14} color="#666" /> },
-        { id: 'travel', name: 'VIAJES', icon: <Plane size={14} color="#666" /> },
-        { id: 'sport', name: 'SPORT', icon: <TrendingUp size={14} color="#666" /> },
+        { id: 'tecnología', name: 'TECNOLOGÍA', icon: <Smartphone size={14} color="#666" /> },
+        { id: 'viajes', name: 'VIAJES', icon: <Plane size={14} color="#666" /> },
+        { id: 'sport', name: 'SPORT', icon: <Volleyball size={14} color="#666" /> },
+        { id: 'finanzas', name: 'FINANZAS', icon: <TrendingUp size={14} color="#666" /> },
+        { id: 'administración', name: 'ADMINISTRACIÓN', icon: <SquareChartGantt size={14} color="#666" /> },
+        { id: 'inversion', name: 'INVERSIÓN', icon: <Bitcoin size={14} color="#666" /> },
+        { id: 'Startups', name: 'STARTUPS', icon: <Rocket size={14} color="#666" /> },
+        { id: 'noticias', name: 'NOTICIAS', icon: <Newspaper size={14} color="#666" /> },
     ];
 
     /* Static mockup data for latest news removed or kept as is if not part of the query */
@@ -273,32 +278,74 @@ const HomePage = () => {
                             Últimas Noticias
                         </Text>
 
-                        {newsList.map((news: any) => (
-                            <View key={news._id} className="mb-10">
-                                <View className="w-full aspect-[16/10] bg-gray-100 rounded-3xl overflow-hidden mb-6 shadow-2xl">
-                                    <RNImage
-                                        source={{ uri: getImageUrl(news.image) }}
-                                        className="w-full h-full"
-                                        resizeMode="cover"
-                                    />
+                        {newsList.map((news: any) => {
+                            const isHero = news.type === 'hero-image';
+                            const isQuote = news.type === 'quote-block';
+                            const isBullet = news.type === 'bullet-list';
+
+                            return (
+                                <View key={news._id} className="mb-10">
+                                    {isHero && (
+                                        <View className="w-full aspect-[16/10] bg-gray-100 rounded-3xl overflow-hidden mb-6 shadow-2xl">
+                                            <RNImage
+                                                source={{ uri: getImageUrl(news.contentHero?.imageUrl) }}
+                                                className="w-full h-full"
+                                                resizeMode="cover"
+                                            />
+                                        </View>
+                                    )}
+                                    <View className="flex-row items-center mb-3">
+                                        <View className="bg-amber-100 dark:bg-amber-900/30 px-3 py-1 rounded-md mr-3">
+                                            <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[9px] text-[#d97706] uppercase tracking-[2px]">{news.category}</Text>
+                                        </View>
+                                        <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[10px] text-[#999] uppercase">{new Date(news.createdAt).toLocaleDateString()}</Text>
+                                    </View>
+
+                                    <Text
+                                        style={{ fontFamily: 'PlayfairDisplay_700Bold' }}
+                                        className="text-2xl text-[#1a1a1a] dark:text-[#f3f4f6] mb-4 leading-8"
+                                    >
+                                        {news.title}
+                                    </Text>
+
+                                    {isHero && (
+                                        <Text
+                                            style={{ fontFamily: 'Inter_400Regular' }}
+                                            className="text-sm text-[#666] dark:text-[#999] leading-6 mb-6"
+                                        >
+                                            {news.contentHero?.description}
+                                        </Text>
+                                    )}
+
+                                    {isQuote && (
+                                        <View className="p-6 border-l-2 border-[#d97706] bg-amber-50/50 dark:bg-amber-900/5 mb-6">
+                                            <Text style={{ fontFamily: 'PlayfairDisplay_400Regular' }} className="text-lg italic text-[#444] dark:text-[#ccc] mb-2 leading-7">
+                                                "{news.contentQuote?.quoteText}"
+                                            </Text>
+                                            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-[#d97706] uppercase tracking-wider">
+                                                — {news.contentQuote?.context}
+                                            </Text>
+                                        </View>
+                                    )}
+
+                                    {isBullet && (
+                                        <View className="mb-6 gap-3">
+                                            {news.contentBullet?.points.split(',').map((point: string, idx: number) => (
+                                                <View key={idx} className="flex-row items-center gap-3">
+                                                    <View className="w-1.5 h-1.5 rounded-full bg-[#d97706]" />
+                                                    <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-sm text-[#666] dark:text-[#999] flex-1">
+                                                        {point.trim()}
+                                                    </Text>
+                                                </View>
+                                            ))}
+                                            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-[#999] mt-2 italic">Editor: {news.contentBullet?.author}</Text>
+                                        </View>
+                                    )}
+
+                                    <View className="h-[1px] bg-[#eee] dark:bg-[#222] w-full mt-6" />
                                 </View>
-                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] text-[#d97706] uppercase tracking-[3px] mb-3">{news.category}</Text>
-                                <Text
-                                    style={{ fontFamily: 'PlayfairDisplay_700Bold' }}
-                                    className="text-2xl text-[#1a1a1a] dark:text-[#f3f4f6] mb-4 leading-8"
-                                >
-                                    {news.title}
-                                </Text>
-                                <Text
-                                    style={{ fontFamily: 'Inter_400Regular' }}
-                                    className="text-sm text-[#666] dark:text-[#999] leading-6 mb-6"
-                                >
-                                    {news.subTitle}
-                                </Text>
-                                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[10px] text-[#999] uppercase">{new Date(news.createdAt).toLocaleDateString()}</Text>
-                                <View className="h-[1px] bg-[#eee] dark:bg-[#222] w-full mt-10" />
-                            </View>
-                        ))}
+                            );
+                        })}
 
                         {/* TRENDS LIST */}
                         <View className="mt-4 gap-6">

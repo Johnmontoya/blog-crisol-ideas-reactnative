@@ -1,3 +1,4 @@
+import { urlServer } from '@/config/config';
 import { BLOG_DATA } from '@/constants/constants';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useDeleteBlogMutation, useToggleBlogMutation } from '@/queries/mutation/blogMutation';
@@ -19,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 import { AlertTriangle, BookOpen, CheckCircle, EyeOff, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, Image as RNImage, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function ListBlogScreen() {
@@ -59,6 +60,14 @@ export default function ListBlogScreen() {
         setModalVisible(true);
     };
 
+    const getImageUrl = (imagePath: string) => {
+        if (!imagePath) return undefined;
+        let normalizedPath = String(imagePath).replace(/\\/g, '/');
+        if (normalizedPath.startsWith('http')) return normalizedPath;
+        if (!normalizedPath.startsWith('/')) normalizedPath = '/' + normalizedPath;
+        return `${urlServer}${normalizedPath}`;
+    };
+
     const confirmDelete = () => {
         if (!selectedBlog) return;
 
@@ -93,7 +102,7 @@ export default function ListBlogScreen() {
     if (!playfairLoaded || !interLoaded || isLoading) {
         return (
             <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212]">
-                <ActivityIndicator size="large" color="#000" />
+                <ActivityIndicator size="large" color="#d97706" />
                 {!isLoading && <Text className="mt-4 text-[#666]">Cargando fuentes...</Text>}
             </View>
         );
@@ -179,8 +188,16 @@ export default function ListBlogScreen() {
 
                                         {/* Blog Title & Icon */}
                                         <View className="flex-[3] w-24 flex-row items-center gap-4">
-                                            <View className="w-12 h-12 rounded-2xl bg-[#f8fafc] dark:bg-[#121212] border border-gray-100 dark:border-gray-800 items-center justify-center">
-                                                <BookOpen size={20} color="#6366f1" />
+                                            <View className="w-12 h-12 rounded-2xl bg-[#f8fafc] dark:bg-[#121212] border border-gray-100 dark:border-gray-800 items-center justify-center overflow-hidden">
+                                                {item.image ? (
+                                                    <RNImage
+                                                        source={{ uri: getImageUrl(item.image) }}
+                                                        className="w-full h-full"
+                                                        resizeMode="cover"
+                                                    />
+                                                ) : (
+                                                    <BookOpen size={20} color="#6366f1" />
+                                                )}
                                             </View>
                                             <View className="flex-1">
                                                 <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-sm text-[#1a1a1a] dark:text-[#f3f4f6]" numberOfLines={2}>

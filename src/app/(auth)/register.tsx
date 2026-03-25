@@ -1,23 +1,34 @@
-import { UserContext } from '@/context/UserContextProvider';
 import { useRegisterUserMutation } from '@/queries/mutation/userMutation';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    useFonts as useInterFonts
+} from '@expo-google-fonts/inter';
+import {
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_800ExtraBold,
+    useFonts as usePlayfairFonts
+} from '@expo-google-fonts/playfair-display';
+import { ArrowLeft, Lock, Mail, User } from 'lucide-react-native';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function RegisterScreen() {
-  const { } = useContext(UserContext);
-  const createUserMutation = useRegisterUserMutation();
+    const createUserMutation = useRegisterUserMutation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,112 +72,189 @@ export default function RegisterScreen() {
     }
   };
 
-  return (
-    <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} className="flex-1">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 40 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="bg-white/5 rounded-3xl border border-white/10 py-10 px-7 backdrop-blur-md">
-            {/* Brand */}
-            <View className="items-center mb-9">
-              <View className="w-16 h-16 rounded-full bg-violet-500/25 border border-violet-500 justify-center items-center mb-4">
-                <Text className="text-3xl text-violet-300">✦</Text>
-              </View>
-              <Text className="text-2xl font-bold text-gray-50 tracking-wide">Crisol Ideas</Text>
-              <Text className="text-sm text-gray-400 mt-1">Crea tu cuenta</Text>
+    const [playfairLoaded] = usePlayfairFonts({
+        PlayfairDisplay_400Regular,
+        PlayfairDisplay_700Bold,
+        PlayfairDisplay_800ExtraBold,
+    });
+
+    const [interLoaded] = useInterFonts({
+        Inter_400Regular,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    const colorScheme = useColorScheme() ?? 'light';
+    const isDark = colorScheme === 'dark';
+
+    if (!playfairLoaded || !interLoaded) {
+        return (
+            <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212]">
+                <ActivityIndicator size="large" color="#d97706" />
             </View>
+        );
+    }
 
-            {/* Fields */}
-            <View className="gap-y-4">
-              <View>
-                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Nombre</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
-                  placeholder="Tu nombre"
-                  placeholderTextColor="#6b7280"
-                  autoCapitalize="words"
-                  value={name}
-                  onChangeText={setName}
-                />
-              </View>
+    return (
+        <View className="flex-1 bg-[#fdfdfc] dark:bg-[#121212]">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <ScrollView 
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                >
+                    <View className="flex-1 px-8 pt-20 pb-12">
+                        {/* Back Button */}
+                        <Animated.View entering={FadeInUp.duration(600)}>
+                            <Pressable
+                                onPress={() => router.back()}
+                                className="w-12 h-12 bg-gray-100 dark:bg-[#1e1e1e] rounded-full items-center justify-center mb-10 shadow-sm"
+                            >
+                                <ArrowLeft size={22} color={isDark ? '#f3f4f6' : '#1a1a1a'} strokeWidth={1.5} />
+                            </Pressable>
+                        </Animated.View>
 
-              <View>
-                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Correo electrónico</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
-                  placeholder="tu@email.com"
-                  placeholderTextColor="#6b7280"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  value={email}
-                  onChangeText={setEmail}
-                />
-              </View>
+                        {/* Brand Section */}
+                        <Animated.View 
+                            entering={FadeInUp.duration(800).delay(200)}
+                            className="mb-10"
+                        >
+                            <Text
+                                style={{ fontFamily: 'PlayfairDisplay_800ExtraBold' }}
+                                className="text-4xl text-[#1a1a1a] dark:text-[#f3f4f6] tracking-tight"
+                            >
+                                ÚNETE A NOSOTROS
+                            </Text>
+                            <View className="w-12 h-1 bg-[#d97706] mt-4 rounded-full" />
+                            <Text
+                                style={{ fontFamily: 'Inter_400Regular' }}
+                                className="text-lg text-[#666] dark:text-[#999] mt-6"
+                            >
+                                Comienza tu viaje intelectual hoy.
+                            </Text>
+                        </Animated.View>
 
-              <View>
-                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Contraseña</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
-                  placeholder="Mínimo 6 caracteres"
-                  placeholderTextColor="#6b7280"
-                  secureTextEntry
-                  value={password}
-                  onChangeText={setPassword}
-                />
-              </View>
+                        {/* Form Section */}
+                        <Animated.View 
+                            entering={FadeInDown.duration(800).delay(400)}
+                            className="gap-5"
+                        >
+                            <View>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-2 ml-1">NOMBRE COMPLETO</Text>
+                                <View className="relative">
+                                    <View className="absolute left-5 top-[18px] z-10">
+                                        <User size={18} color="#94a3b8" />
+                                    </View>
+                                    <TextInput
+                                        style={{ fontFamily: 'Inter_400Regular' }}
+                                        className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base"
+                                        placeholder="Tu nombre"
+                                        placeholderTextColor="#94a3b8"
+                                        value={name}
+                                        onChangeText={setName}
+                                    />
+                                </View>
+                            </View>
 
-              <View>
-                <Text className="text-[13px] font-semibold text-gray-300 mb-1.5 ml-1">Confirmar contraseña</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-gray-50 text-[15px]"
-                  placeholder="Repite tu contraseña"
-                  placeholderTextColor="#6b7280"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                />
-              </View>
+                            <View>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-2 ml-1">CORREO ELECTRÓNICO</Text>
+                                <View className="relative">
+                                    <View className="absolute left-5 top-[18px] z-10">
+                                        <Mail size={18} color="#94a3b8" />
+                                    </View>
+                                    <TextInput
+                                        style={{ fontFamily: 'Inter_400Regular' }}
+                                        className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base"
+                                        placeholder="tu@email.com"
+                                        placeholderTextColor="#94a3b8"
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                    />
+                                </View>
+                            </View>
 
-              {error && (
-                <View className="bg-red-500/15 border border-red-500/40 rounded-lg p-3 mt-3.5">
-                  <Text className="text-red-300 text-[13px] text-center">{error}</Text>
-                </View>
-              )}
+                            <View>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-2 ml-1">CONTRASEÑA</Text>
+                                <View className="relative">
+                                    <View className="absolute left-5 top-[18px] z-10">
+                                        <Lock size={18} color="#94a3b8" />
+                                    </View>
+                                    <TextInput
+                                        style={{ fontFamily: 'Inter_400Regular' }}
+                                        className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base"
+                                        placeholder="Mínimo 6 caracteres"
+                                        placeholderTextColor="#94a3b8"
+                                        secureTextEntry
+                                        value={password}
+                                        onChangeText={setPassword}
+                                    />
+                                </View>
+                            </View>
 
-              <Pressable
-                className={`bg-violet-600 rounded-2xl py-4 items-center mt-6 active:opacity-85 active:scale-[0.98] ${
-                  isSubmitting ? 'opacity-70' : 'opacity-100'
-                }`}
-                onPress={handleRegister}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-white font-bold text-base tracking-wide">Crear cuenta</Text>
-                )}
-              </Pressable>
-            </View>
+                            <View>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-2 ml-1">CONFIRMAR CONTRASEÑA</Text>
+                                <View className="relative">
+                                    <View className="absolute left-5 top-[18px] z-10">
+                                        <Lock size={18} color="#94a3b8" />
+                                    </View>
+                                    <TextInput
+                                        style={{ fontFamily: 'Inter_400Regular' }}
+                                        className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base"
+                                        placeholder="Repite tu contraseña"
+                                        placeholderTextColor="#94a3b8"
+                                        secureTextEntry
+                                        value={confirmPassword}
+                                        onChangeText={setConfirmPassword}
+                                    />
+                                </View>
+                            </View>
 
-            {/* Footer */}
-            <View className="flex-row justify-center mt-8">
-              <Text className="text-sm text-gray-400">¿Ya tienes cuenta? </Text>
-              <Pressable onPress={() => router.back()}>
-                <Text className="text-sm text-violet-400 font-bold">Inicia sesión</Text>
-              </Pressable>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
-  );
+                            {error && (
+                                <View className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl p-4 mt-2">
+                                    <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-red-500 text-xs text-center">{error}</Text>
+                                </View>
+                            )}
+
+                            <Pressable
+                                onPress={handleRegister}
+                                disabled={isSubmitting}
+                                className={`bg-black dark:bg-white rounded-2xl py-5 items-center mt-6 shadow-xl ${
+                                    isSubmitting ? 'opacity-70' : 'opacity-100'
+                                }`}
+                            >
+                                {isSubmitting ? (
+                                    <ActivityIndicator color={isDark ? '#000' : '#fff'} />
+                                ) : (
+                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-white dark:text-black text-lg tracking-wider">
+                                        Crear Cuenta
+                                    </Text>
+                                )}
+                            </Pressable>
+                        </Animated.View>
+
+                        {/* Footer */}
+                        <Animated.View 
+                            entering={FadeInUp.duration(800).delay(600)}
+                            className="flex-row justify-center mt-10 mb-8"
+                        >
+                            <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-sm text-[#64748b]">
+                                ¿Ya tienes cuenta?{' '}
+                            </Text>
+                            <Pressable onPress={() => router.back()}>
+                                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-sm text-[#d97706]">
+                                    Inicia sesión.
+                                </Text>
+                            </Pressable>
+                        </Animated.View>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
+    );
 }
 
 

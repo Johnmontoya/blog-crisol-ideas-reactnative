@@ -1,17 +1,16 @@
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Menu, Search, User } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { User } from 'lucide-react-native';
 import React from 'react';
 import {
-    Platform,
     StyleSheet,
     Text,
     View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import AnimatedPressable from './ui/AnimatedPressable';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import routerMeta from '../types/routerMeta';
+import AnimatedPressable from './ui/AnimatedPressable';
 
 const HomeNavbar = () => {
     const colorScheme = useColorScheme() ?? 'light';
@@ -24,49 +23,33 @@ const HomeNavbar = () => {
             styles.safeArea,
             { backgroundColor: isDark ? '#121212' : '#fdfdfc' }
         ]}>
-            <Animated.View 
+            <Animated.View
                 entering={FadeIn.duration(800)}
                 style={styles.container}
             >
-                {/* Left: Menu Icon */}
-                <AnimatedPressable style={styles.iconButton}>
-                    <Menu 
-                        size={22} 
-                        strokeWidth={1.5}
-                        color={isDark ? '#f3f4f6' : '#1a1a1a'} 
-                    />
-                </AnimatedPressable>
-
                 {/* Center: Brand/Logo */}
                 <View style={styles.brandContainer}>
-                    <Text 
+                    <Text
                         style={[
                             styles.brandText,
                             { color: isDark ? '#f3f4f6' : '#1a1a1a', fontFamily: 'PlayfairDisplay_800ExtraBold' }
                         ]}
                     >
-                        CRISOL
+                        CRISOL DE IDEAS
                     </Text>
                     <View style={styles.dot} />
                 </View>
 
                 {/* Right: Search & Profile */}
                 <View style={styles.rightSection}>
-                    <AnimatedPressable style={styles.iconButton}>
-                        <Search 
-                            size={22} 
-                            strokeWidth={1.5}
-                            color={isDark ? '#f3f4f6' : '#1a1a1a'} 
-                        />
-                    </AnimatedPressable>
-                    <AnimatedPressable 
+                    <AnimatedPressable
                         style={styles.iconButton}
                         onPress={() => navigation.navigate(routerMeta.LoginPage.name)}
                     >
-                        <User 
-                            size={22} 
+                        <User
+                            size={22}
                             strokeWidth={1.5}
-                            color={isDark ? '#f3f4f6' : '#1a1a1a'} 
+                            color={isDark ? '#f3f4f6' : '#1a1a1a'}
                         />
                     </AnimatedPressable>
                 </View>
@@ -78,7 +61,7 @@ const HomeNavbar = () => {
 const styles = StyleSheet.create({
     safeArea: {
         zIndex: 100,
-        borderBottomWidth:1,
+        borderBottomWidth: 1,
         borderBottomColor: 'rgba(0,0,0,0.05)',
     },
     container: {

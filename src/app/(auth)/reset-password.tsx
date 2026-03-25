@@ -1,16 +1,31 @@
 import { useResetMutation } from '@/queries/mutation/userMutation';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    useFonts as useInterFonts
+} from '@expo-google-fonts/inter';
+import {
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_800ExtraBold,
+    useFonts as usePlayfairFonts
+} from '@expo-google-fonts/playfair-display';
+import { ArrowLeft, Lock, CheckCircle2 } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function ResetPasswordPage() {
   const { userId, token } = useLocalSearchParams<{ userId: string; token: string }>();
@@ -59,102 +74,161 @@ export default function ResetPasswordPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  };    const [playfairLoaded] = usePlayfairFonts({
+        PlayfairDisplay_400Regular,
+        PlayfairDisplay_700Bold,
+        PlayfairDisplay_800ExtraBold,
+    });
 
-  return (
-    <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} className="flex-1">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-center px-6"
-      >
-        <View className="bg-white/10 rounded-[32px] border border-white/10 py-10 px-8 backdrop-blur-md">
-          {/* Header */}
-          <View className="items-center mb-8">
-            <View className="w-16 h-16 rounded-full bg-violet-500/20 border border-violet-500/50 justify-center items-center mb-4">
-              <Text className="text-3xl text-violet-400">✦</Text>
+    const [interLoaded] = useInterFonts({
+        Inter_400Regular,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    const colorScheme = useColorScheme() ?? 'light';
+    const isDark = colorScheme === 'dark';
+
+    if (!playfairLoaded || !interLoaded) {
+        return (
+            <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212]">
+                <ActivityIndicator size="large" color="#d97706" />
             </View>
-            <Text className="text-2xl font-bold text-gray-100 tracking-tight text-center">
-              Nueva Contraseña
-            </Text>
-            {!isSuccess && (
-              <Text className="text-sm text-gray-400 mt-2 text-center px-2">
-                Crea una contraseña segura para proteger tu cuenta.
-              </Text>
-            )}
-          </View>
+        );
+    }
 
-          {!isSuccess ? (
-            <View className="space-y-4">
-              <View>
-                <Text className="text-xs font-semibold text-gray-300 mb-2 ml-1">Nueva Contraseña</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-gray-50 text-[15px]"
-                  placeholder="••••••••"
-                  placeholderTextColor="#6b7280"
-                  secureTextEntry
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    if (error) setError(null);
-                  }}
-                />
-              </View>
+    return (
+        <View className="flex-1 bg-[#fdfdfc] dark:bg-[#121212]">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <ScrollView 
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                >
+                    <View className="flex-1 px-8 pt-20 pb-12">
+                        {/* Back Button */}
+                        <Animated.View entering={FadeInUp.duration(600)}>
+                            <Pressable
+                                onPress={() => router.back()}
+                                className="w-12 h-12 bg-gray-100 dark:bg-[#1e1e1e] rounded-full items-center justify-center mb-12 shadow-sm"
+                            >
+                                <ArrowLeft size={22} color={isDark ? '#f3f4f6' : '#1a1a1a'} strokeWidth={1.5} />
+                            </Pressable>
+                        </Animated.View>
 
-              <View>
-                <Text className="text-xs font-semibold text-gray-300 mb-2 mt-4 ml-1">Confirmar Contraseña</Text>
-                <TextInput
-                  className="bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-gray-50 text-[15px]"
-                  placeholder="••••••••"
-                  placeholderTextColor="#6b7280"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    if (error) setError(null);
-                  }}
-                />
-              </View>
+                        {/* Brand Section */}
+                        <Animated.View 
+                            entering={FadeInUp.duration(800).delay(200)}
+                            className="mb-12"
+                        >
+                            <Text
+                                style={{ fontFamily: 'PlayfairDisplay_800ExtraBold' }}
+                                className="text-4xl text-[#1a1a1a] dark:text-[#f3f4f6] tracking-tight"
+                            >
+                                {isSuccess ? '¡TODO LISTO!' : 'NUEVA CONTRASEÑA'}
+                            </Text>
+                            <View className="w-12 h-1 bg-[#d97706] mt-4 rounded-full" />
+                            <Text
+                                style={{ fontFamily: 'Inter_400Regular' }}
+                                className="text-lg text-[#666] dark:text-[#999] mt-6 leading-7"
+                            >
+                                {isSuccess 
+                                    ? "Tu seguridad ha sido actualizada con éxito."
+                                    : "Crea una credencial robusta para proteger tu santuario de ideas."}
+                            </Text>
+                        </Animated.View>
 
-              {error && (
-                <View className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 mt-4">
-                  <Text className="text-red-300 text-xs text-center">{error}</Text>
-                </View>
-              )}
+                        {!isSuccess ? (
+                            <Animated.View 
+                                entering={FadeInDown.duration(800).delay(400)}
+                                className="gap-6"
+                            >
+                                <View>
+                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-3 ml-1">NUEVA CONTRASEÑA</Text>
+                                    <View className="relative">
+                                        <View className="absolute left-5 top-[18px] z-10">
+                                            <Lock size={18} color="#94a3b8" />
+                                        </View>
+                                        <TextInput
+                                            style={{ fontFamily: 'Inter_400Regular' }}
+                                            className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base shadow-sm"
+                                            placeholder="••••••••"
+                                            placeholderTextColor="#94a3b8"
+                                            secureTextEntry
+                                            value={password}
+                                            onChangeText={setPassword}
+                                        />
+                                    </View>
+                                </View>
 
-              <Pressable
-                onPress={handleReset}
-                disabled={isSubmitting}
-                className={`bg-violet-600 rounded-2xl py-4 items-center mt-8 active:opacity-80 active:scale-[0.98] ${
-                  isSubmitting ? 'opacity-70' : 'opacity-100'
-                }`}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-white font-bold text-base tracking-wide">Cambiar contraseña</Text>
-                )}
-              </Pressable>
-            </View>
-          ) : (
-            <View className="items-center py-4">
-              <View className="w-14 h-14 rounded-full bg-green-500/20 border border-green-500/50 justify-center items-center mb-4">
-                <Text className="text-2xl text-green-400">✓</Text>
-              </View>
-              <Text className="text-gray-100 text-center font-medium mb-2">¡Completado!</Text>
-              <Text className="text-gray-400 text-center text-sm px-4">
-                Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.
-              </Text>
-              
-              <Pressable
-                onPress={() => router.replace('/(auth)/login')}
-                className="bg-violet-600 rounded-2xl py-4 px-10 items-center mt-8"
-              >
-                <Text className="text-white font-bold">Ir a Iniciar Sesión</Text>
-              </Pressable>
-            </View>
-          )}
+                                <View>
+                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-3 ml-1">CONFIRMAR CONTRASEÑA</Text>
+                                    <View className="relative">
+                                        <View className="absolute left-5 top-[18px] z-10">
+                                            <Lock size={18} color="#94a3b8" />
+                                        </View>
+                                        <TextInput
+                                            style={{ fontFamily: 'Inter_400Regular' }}
+                                            className="bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 rounded-2xl pl-14 pr-6 py-5 text-[#1a1a1a] dark:text-[#f3f4f6] text-base shadow-sm"
+                                            placeholder="••••••••"
+                                            placeholderTextColor="#94a3b8"
+                                            secureTextEntry
+                                            value={confirmPassword}
+                                            onChangeText={setConfirmPassword}
+                                        />
+                                    </View>
+                                </View>
+
+                                {error && (
+                                    <View className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl p-4">
+                                        <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-red-500 text-xs text-center">{error}</Text>
+                                    </View>
+                                )}
+
+                                <Pressable
+                                    onPress={handleReset}
+                                    disabled={isSubmitting}
+                                    className={`bg-black dark:bg-white rounded-2xl py-5 items-center mt-6 shadow-xl ${
+                                        isSubmitting ? 'opacity-70' : 'opacity-100'
+                                    }`}
+                                >
+                                    {isSubmitting ? (
+                                        <ActivityIndicator color={isDark ? '#000' : '#fff'} />
+                                    ) : (
+                                        <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-white dark:text-black text-lg tracking-wider">
+                                            Restablecer Contraseña
+                                        </Text>
+                                    )}
+                                </Pressable>
+                            </Animated.View>
+                        ) : (
+                            <Animated.View 
+                                entering={FadeInDown.duration(800)}
+                                className="items-center py-10 gap-8"
+                            >
+                                <View className="w-20 h-20 rounded-full bg-green-50 dark:bg-green-900/10 items-center justify-center">
+                                    <CheckCircle2 size={40} color="#10b981" strokeWidth={1.5} />
+                                </View>
+                                
+                                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-center text-[#666] dark:text-[#999] leading-6 px-4">
+                                    Tu contraseña ha sido actualizada. Ahora puedes volver a entrar a tu santuario de reflexión.
+                                </Text>
+
+                                <Pressable
+                                    onPress={() => router.replace('/(auth)/login')}
+                                    className="bg-black dark:bg-white rounded-2xl py-5 px-10 items-center w-full shadow-xl"
+                                >
+                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-white dark:text-black">
+                                        Ir al Inicio de Sesión
+                                    </Text>
+                                </Pressable>
+                            </Animated.View>
+                        )}
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </View>
-      </KeyboardAvoidingView>
-    </LinearGradient>
-  );
-}
+    );
+}

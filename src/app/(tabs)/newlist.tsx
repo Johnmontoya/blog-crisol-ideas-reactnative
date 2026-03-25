@@ -1,3 +1,4 @@
+import { urlServer } from '@/config/config';
 import { NEWS_DATA } from '@/constants/constants';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useDeleteNewsMutation, useStateNewsMutation } from '@/queries/mutation/newsMutation';
@@ -16,10 +17,9 @@ import {
 } from '@expo-google-fonts/playfair-display';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
 import { AlertTriangle, CheckCircle, EyeOff, ImageIcon, List, Newspaper, Quote, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, Image as RNImage, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function NewListScreen() {
@@ -57,6 +57,14 @@ export default function NewListScreen() {
         } catch (e) { }
         setSelectedNews({ id, title });
         setModalVisible(true);
+    };
+
+    const getImageUrl = (imagePath: string) => {
+        if (!imagePath) return undefined;
+        let normalizedPath = String(imagePath).replace(/\\/g, '/');
+        if (normalizedPath.startsWith('http')) return normalizedPath;
+        if (!normalizedPath.startsWith('/')) normalizedPath = '/' + normalizedPath;
+        return `${urlServer}${normalizedPath}`;
     };
 
     const confirmDelete = () => {
@@ -102,7 +110,7 @@ export default function NewListScreen() {
     if (!playfairLoaded || !interLoaded || isLoading) {
         return (
             <View className="flex-1 justify-center items-center bg-[#fdfdfc] dark:bg-[#121212]">
-                <ActivityIndicator size="large" color="#000" />
+                <ActivityIndicator size="large" color="#d97706" />
                 {!isLoading && <Text className="mt-4 text-[#666]">Cargando fuentes...</Text>}
             </View>
         );
@@ -193,10 +201,10 @@ export default function NewListScreen() {
                                         <View className="flex-[3] w-24 flex-row items-center gap-4">
                                             <View className="w-14 h-14 rounded-2xl bg-[#f8fafc] dark:bg-[#121212] border border-gray-100 dark:border-gray-800 items-center justify-center overflow-hidden">
                                                 {item.type === 'hero-image' && item.contentHero?.imageUrl ? (
-                                                    <Image
-                                                        source={{ uri: item.contentHero.imageUrl }}
+                                                    <RNImage
+                                                        source={{ uri: getImageUrl(item.contentHero.imageUrl) }}
                                                         className="w-full h-full"
-                                                        contentFit="cover"
+                                                        resizeMode="cover"
                                                     />
                                                 ) : (
                                                     getIcon(item.type)
