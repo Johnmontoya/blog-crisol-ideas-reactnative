@@ -13,11 +13,17 @@ import {
     PlayfairDisplay_700Bold,
     useFonts as usePlayfairFonts
 } from '@expo-google-fonts/playfair-display';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Haptics from 'expo-haptics';
 import { CheckCircle, Image as ImageIcon, List, Newspaper, Quote } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import BulletList from './(newsform)/BulletList';
+import HeroImage from './(newsform)/HeroImage';
+import QuoteBlock from './(newsform)/QuoteBlock';
+
+const Tab = createMaterialTopTabNavigator();
 
 const NEWS_TYPES = [
     { value: 'hero-image', label: 'Imagen Destacada', icon: ImageIcon, color: '#3b82f6' },
@@ -144,46 +150,6 @@ export default function AddNewsScreen() {
                     <View className="h-[1px] bg-[#d1d1d1] dark:bg-[#333] w-full mt-6" />
                 </Animated.View>
 
-                {/* News Type Selector */}
-                <Animated.View
-                    entering={FadeInUp.duration(600).delay(200)}
-                    className="mb-10"
-                >
-                    <Text
-                        style={{ fontFamily: 'Inter_700Bold' }}
-                        className="text-[10px] tracking-widest uppercase text-[#64748b] mb-4 ml-1"
-                    >
-                        Plantilla de diseño
-                    </Text>
-                    <View className="flex-row gap-2">
-                        {NEWS_TYPES.map((t) => (
-                            <Pressable
-                                key={t.value}
-                                onPress={() => {
-                                    try {
-                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                                    } catch (e) {
-                                        console.log("Haptics Error:", e);
-                                    }
-                                    setType(t.value);
-                                }}
-                                className={`flex-1 p-4 rounded-xl border items-center justify-center ${type === t.value
-                                    ? 'bg-black dark:bg-white border-black dark:border-white shadow-lg'
-                                    : 'bg-white border-gray-100 dark:bg-[#1e1e1e] dark:border-gray-800'
-                                    }`}
-                            >
-                                <t.icon size={20} color={type === t.value ? (colorScheme === 'dark' ? '#000' : '#fff') : '#94a3b8'} strokeWidth={1.5} />
-                                <Text
-                                    style={{ fontFamily: 'Inter_600SemiBold' }}
-                                    className={`text-[9px] uppercase tracking-tighter mt-2 text-center ${type === t.value ? (colorScheme === 'dark' ? 'text-black' : 'text-white') : 'text-[#94a3b8]'
-                                        }`}>
-                                    {t.label}
-                                </Text>
-                            </Pressable>
-                        ))}
-                    </View>
-                </Animated.View>
-
                 {/* Form Fields */}
                 <View className="gap-8">
                     <Animated.View entering={FadeInDown.duration(600).delay(300)}>
@@ -210,98 +176,73 @@ export default function AddNewsScreen() {
                         />
                     </Animated.View>
 
-                    {/* Dynamic Fields Section */}
-                    <Animated.View entering={FadeInDown.duration(600).delay(500)} className="mt-4 pt-8 border-t border-gray-100 dark:border-gray-800">
-                        <View className="flex-row items-center space-x-2 mb-6">
-                            <Text style={{ fontFamily: 'PlayfairDisplay_700Bold' }} className="text-2xl text-[#1a1a1a] dark:text-[#f3f4f6]">
-                                Contenido de {NEWS_TYPES.find(n => n.value === type)?.label || 'Sección'}
-                            </Text>
-                        </View>
-
-                        {type === 'hero-image' && (
-                            <View className="gap-6">
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">URL de la Imagen</Text>
-                                    <TextInput
-                                        value={imageUrl}
-                                        onChangeText={setImageUrl}
-                                        placeholder="https://ejemplo.com/imagen.jpg"
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6]"
-                                    />
-                                </View>
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">Contexto / Pie de foto</Text>
-                                    <TextInput
-                                        value={description}
-                                        onChangeText={setDescription}
-                                        multiline
-                                        placeholder="Describa brevemente la noticia..."
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6] min-h-[120px]"
-                                    />
-                                </View>
-                            </View>
-                        )}
-
-                        {type === 'quote-block' && (
-                            <View className="gap-6">
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">Texto de la Cita</Text>
-                                    <TextInput
-                                        value={quoteText}
-                                        onChangeText={setQuoteText}
-                                        multiline
-                                        placeholder="La frase que aparecerá destacada..."
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6] min-h-[120px]"
-                                    />
-                                </View>
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">Autor de la frase</Text>
-                                    <TextInput
-                                        value={context}
-                                        onChangeText={setContext}
-                                        placeholder="Nombre del autor o fuente"
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6]"
-                                    />
-                                </View>
-                            </View>
-                        )}
-
-                        {type === 'bullet-list' && (
-                            <View className="gap-6">
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">Puntos clave</Text>
-                                    <TextInput
-                                        value={points}
-                                        onChangeText={setPoints}
-                                        multiline
-                                        placeholder="Punto 1, Punto 2, Punto 3..."
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6] min-h-[150px]"
-                                    />
-                                </View>
-                                <View>
-                                    <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] tracking-widest uppercase text-[#64748b] mb-2 ml-1">Editor responsable</Text>
-                                    <TextInput
-                                        value={author}
-                                        onChangeText={setAuthor}
-                                        placeholder="Nombre del editor o autor"
-                                        placeholderTextColor="#94a3b8"
-                                        style={{ fontFamily: 'Inter_400Regular' }}
-                                        className="bg-white dark:bg-[#1e1e1e] p-5 rounded-lg border border-gray-100 dark:border-gray-800 text-[#1a1a1a] dark:text-[#f3f4f6]"
-                                    />
-                                </View>
-                            </View>
-                        )}
+                    {/* News Type Selector replaced by Tab Navigator Label */}
+                    <Animated.View
+                        entering={FadeInUp.duration(600).delay(200)}
+                        className="mb-4"
+                    >
+                        <Text
+                            style={{ fontFamily: 'Inter_700Bold' }}
+                            className="text-[10px] tracking-widest uppercase text-[#64748b] ml-1"
+                        >
+                            Seleccione Plantilla
+                        </Text>
                     </Animated.View>
+
+                    <View className="pt-8 border-t border-gray-100 dark:border-gray-800" style={{ height: 450 }}>
+                        <Tab.Navigator
+                            screenOptions={{
+                                tabBarLabelStyle: { fontSize: 10, fontFamily: 'Inter_700Bold', textTransform: 'uppercase' },
+                                tabBarStyle: { backgroundColor: 'transparent', elevation: 0, shadowOpacity: 0 },
+                                tabBarActiveTintColor: colorScheme === 'dark' ? '#fff' : '#000',
+                                tabBarInactiveTintColor: '#94a3b8',
+                                tabBarIndicatorStyle: { backgroundColor: '#d97706', height: 3, borderRadius: 3 },
+                            }}
+                            screenListeners={{
+                                state: (e: any) => {
+                                    const index = e.data.state.index;
+                                    const routeName = e.data.state.routeNames[index];
+                                    if (routeName === 'Imagen') setType('hero-image');
+                                    if (routeName === 'Cita') setType('quote-block');
+                                    if (routeName === 'Lista') setType('bullet-list');
+                                },
+                            }}
+                        >
+                            <Tab.Screen name="Imagen">
+                                {() => (
+                                    <HeroImage
+                                        imageUrl={imageUrl}
+                                        setImageUrl={setImageUrl}
+                                        description={description}
+                                        setDescription={setDescription}
+                                        colorScheme={colorScheme}
+                                    />
+                                )}
+                            </Tab.Screen>
+                            <Tab.Screen name="Cita">
+                                {() => (
+                                    <QuoteBlock
+                                        quoteText={quoteText}
+                                        setQuoteText={setQuoteText}
+                                        context={context}
+                                        setContext={setContext}
+                                        colorScheme={colorScheme}
+                                    />
+                                )}
+                            </Tab.Screen>
+                            <Tab.Screen name="Lista">
+                                {() => (
+                                    <BulletList
+                                        points={points}
+                                        setPoints={setPoints}
+                                        author={author}
+                                        setAuthor={setAuthor}
+                                        colorScheme={colorScheme}
+                                    />
+                                )}
+                            </Tab.Screen>
+                        </Tab.Navigator>
+                    </View>
                 </View>
 
                 {/* Submit button using AnimatedPressable */}

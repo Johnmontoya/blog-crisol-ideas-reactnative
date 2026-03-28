@@ -116,7 +116,7 @@ export default function LoginScreen() {
                         {/* Back Button */}
                         <Animated.View entering={FadeInUp.duration(600)}>
                             <Pressable
-                                onPress={() => navigation.goBack() || navigation.navigate(routerMeta.HomePage.name)}
+                                onPress={() => navigation.navigate(routerMeta.HomePage.name)}
                                 className="w-12 h-12 bg-gray-100 dark:bg-[#1e1e1e] rounded-full items-center justify-center mb-12 shadow-sm"
                             >
                                 <ArrowLeft size={22} color={isDark ? '#f3f4f6' : '#1a1a1a'} strokeWidth={1.5} />
