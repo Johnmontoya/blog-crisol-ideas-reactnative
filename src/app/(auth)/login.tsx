@@ -1,13 +1,11 @@
 import { ACCESS_TOKEN_KEY } from '@/config/config';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserContext } from '@/context/UserContextProvider';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { decodeToken } from '@/lib/jwt';
 import token from '@/lib/token';
 import { useLoginMutation } from '@/queries/mutation/userMutation';
 import { useAuthStore } from '@/store/auth';
 import routerMeta from '@/types/routerMeta';
-import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
     Inter_400Regular,
     Inter_600SemiBold,
@@ -20,6 +18,7 @@ import {
     PlayfairDisplay_800ExtraBold,
     useFonts as usePlayfairFonts
 } from '@expo-google-fonts/playfair-display';
+import { useNavigation } from '@react-navigation/native';
 import { ArrowLeft, Lock, Mail } from 'lucide-react-native';
 import React, { useContext, useState } from 'react';
 import {
@@ -35,53 +34,53 @@ import {
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function LoginScreen() {
-  const { setIsLogin, setRole, setAuthToken } = useContext(UserContext);
-  const navigation = useNavigation<any>();
-  const auth = useAuthStore((state) => state.setUserData);
-  const loginUserMutation = useLoginMutation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const colorScheme = useColorScheme() ?? 'light';
-  const isDark = colorScheme === 'dark';
+    const { setIsLogin, setRole, setAuthToken } = useContext(UserContext);
+    const navigation = useNavigation<any>();
+    const auth = useAuthStore((state) => state.setUserData);
+    const loginUserMutation = useLoginMutation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const colorScheme = useColorScheme() ?? 'light';
+    const isDark = colorScheme === 'dark';
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError('Por favor completa todos los campos.');
-      return;
-    }
+    const handleLogin = async () => {
+        if (!email.trim() || !password.trim()) {
+            setError('Por favor completa todos los campos.');
+            return;
+        }
 
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      await loginUserMutation.mutateAsync({ email: email.trim(), password }, {
-        onSuccess: (data) => {
-          token.setToken(ACCESS_TOKEN_KEY, data.data.token);
-          const decoded = decodeToken(data.data.token);
-          const { role, userId } = decoded;
+        setError(null);
+        setIsSubmitting(true);
+        try {
+            await loginUserMutation.mutateAsync({ email: email.trim(), password }, {
+                onSuccess: (data) => {
+                    token.setToken(ACCESS_TOKEN_KEY, data.data.token);
+                    const decoded = decodeToken(data.data.token);
+                    const { role, userId } = decoded;
 
-          auth(userId, data.data.token);
-          setRole(role);
-          setAuthToken(data.data.token);
-          setIsLogin(true);
+                    auth(userId, data.data.token);
+                    setRole(role);
+                    setAuthToken(data.data.token);
+                    setIsLogin(true);
 
-          const targetDashboard = role === "Admin"
-            ? routerMeta.DashboardAdminPage.name
-            : routerMeta.DashboardUsersPage.name;
+                    const targetDashboard = role === "Admin"
+                        ? routerMeta.DashboardAdminPage.name
+                        : routerMeta.DashboardUsersPage.name;
 
-          navigation.reset({
-            index: 0,
-            routes: [{ name: targetDashboard }],
-          });
-        },
-      });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: targetDashboard }],
+                    });
+                },
+            });
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const [playfairLoaded] = usePlayfairFonts({
         PlayfairDisplay_400Regular,
@@ -109,7 +108,7 @@ export default function LoginScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
             >
-                <ScrollView 
+                <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ flexGrow: 1 }}
                 >
@@ -117,7 +116,7 @@ export default function LoginScreen() {
                         {/* Back Button */}
                         <Animated.View entering={FadeInUp.duration(600)}>
                             <Pressable
-                                onPress={() => navigation.goBack()}
+                                onPress={() => navigation.goBack() || navigation.navigate(routerMeta.HomePage.name)}
                                 className="w-12 h-12 bg-gray-100 dark:bg-[#1e1e1e] rounded-full items-center justify-center mb-12 shadow-sm"
                             >
                                 <ArrowLeft size={22} color={isDark ? '#f3f4f6' : '#1a1a1a'} strokeWidth={1.5} />
@@ -125,7 +124,7 @@ export default function LoginScreen() {
                         </Animated.View>
 
                         {/* Brand Section */}
-                        <Animated.View 
+                        <Animated.View
                             entering={FadeInUp.duration(800).delay(200)}
                             className="mb-12"
                         >
@@ -146,13 +145,13 @@ export default function LoginScreen() {
                         </Animated.View>
 
                         {/* Form Section */}
-                        <Animated.View 
+                        <Animated.View
                             entering={FadeInDown.duration(800).delay(400)}
                             className="gap-6"
                         >
                             <View>
-                                <Text 
-                                    style={{ fontFamily: 'Inter_700Bold' }} 
+                                <Text
+                                    style={{ fontFamily: 'Inter_700Bold' }}
                                     className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-3 ml-1"
                                 >
                                     CORREO ELECTRÓNICO
@@ -175,8 +174,8 @@ export default function LoginScreen() {
                             </View>
 
                             <View>
-                                <Text 
-                                    style={{ fontFamily: 'Inter_700Bold' }} 
+                                <Text
+                                    style={{ fontFamily: 'Inter_700Bold' }}
                                     className="text-[10px] tracking-widest uppercase text-[#94a3b8] mb-3 ml-1"
                                 >
                                     CONTRASEÑA
@@ -199,8 +198,8 @@ export default function LoginScreen() {
                                     onPress={() => navigation.navigate(routerMeta.ForgotPage.name)}
                                     className="mt-4 self-end"
                                 >
-                                    <Text 
-                                        style={{ fontFamily: 'Inter_600SemiBold' }} 
+                                    <Text
+                                        style={{ fontFamily: 'Inter_600SemiBold' }}
                                         className="text-xs text-[#d97706]"
                                     >
                                         ¿Olvidaste tu contraseña?
@@ -210,8 +209,8 @@ export default function LoginScreen() {
 
                             {error && (
                                 <View className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl p-4">
-                                    <Text 
-                                        style={{ fontFamily: 'Inter_400Regular' }} 
+                                    <Text
+                                        style={{ fontFamily: 'Inter_400Regular' }}
                                         className="text-red-500 text-xs text-center leading-5"
                                     >
                                         {error}
@@ -222,15 +221,14 @@ export default function LoginScreen() {
                             <Pressable
                                 onPress={handleLogin}
                                 disabled={isSubmitting}
-                                className={`bg-black dark:bg-white rounded-2xl py-5 items-center mt-6 shadow-xl ${
-                                    isSubmitting ? 'opacity-70' : 'opacity-100'
-                                }`}
+                                className={`bg-black dark:bg-white rounded-2xl py-5 items-center mt-6 shadow-xl ${isSubmitting ? 'opacity-70' : 'opacity-100'
+                                    }`}
                             >
                                 {isSubmitting ? (
                                     <ActivityIndicator color={isDark ? '#000' : '#fff'} />
                                 ) : (
-                                    <Text 
-                                        style={{ fontFamily: 'Inter_700Bold' }} 
+                                    <Text
+                                        style={{ fontFamily: 'Inter_700Bold' }}
                                         className="text-white dark:text-black text-lg tracking-wider"
                                     >
                                         Iniciar Sesión
@@ -240,19 +238,19 @@ export default function LoginScreen() {
                         </Animated.View>
 
                         {/* Register Link */}
-                        <Animated.View 
+                        <Animated.View
                             entering={FadeInUp.duration(800).delay(600)}
                             className="flex-row justify-center mt-12 mb-8"
                         >
-                            <Text 
-                                style={{ fontFamily: 'Inter_400Regular' }} 
+                            <Text
+                                style={{ fontFamily: 'Inter_400Regular' }}
                                 className="text-sm text-[#64748b]"
                             >
                                 ¿No tienes cuenta?{' '}
                             </Text>
                             <Pressable onPress={() => navigation.navigate(routerMeta.RegisterPage.name)}>
-                                <Text 
-                                    style={{ fontFamily: 'Inter_700Bold' }} 
+                                <Text
+                                    style={{ fontFamily: 'Inter_700Bold' }}
                                     className="text-sm text-[#d97706]"
                                 >
                                     Regístrate ahora.

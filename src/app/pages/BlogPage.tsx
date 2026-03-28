@@ -12,18 +12,20 @@ import {
     useFonts as usePlayfairFonts
 } from '@expo-google-fonts/playfair-display';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ArrowLeft, Share2 } from 'lucide-react-native';
+import { Share2 } from 'lucide-react-native';
 import React from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
-    Image as RNImage,
     Pressable,
+    Image as RNImage,
     ScrollView,
+    Share,
     Text,
-    View,
-    ActivityIndicator
+    View
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { WebView } from 'react-native-webview';
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,6 +45,8 @@ export default function BlogPage() {
 
     // Recuperamos los datos pasados desde el HomePage
     const post = route.params?.post;
+
+    const [webViewHeight, setWebViewHeight] = React.useState(100);
 
     const [playfairLoaded] = usePlayfairFonts({
         PlayfairDisplay_400Regular,
@@ -74,18 +78,64 @@ export default function BlogPage() {
         );
     }
 
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+            <style>
+                body {
+                    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+                    font-size: 17px;
+                    color: ${isDark ? '#a3a3a3' : '#444'};
+                    line-height: 1.6;
+                    padding: 0;
+                    margin: 0;
+                    background-color: transparent;
+                }
+                a { color: #d97706; text-decoration: none; font-weight: 500; }
+                img, iframe, video { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+                h1, h2, h3, h4 { color: ${isDark ? '#f3f4f6' : '#1a1a1a'}; font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu; font-weight: bold; margin-top: 24px; margin-bottom: 12px; }
+                p { margin-bottom: 16px; }
+                ul, ol { padding-left: 20px; margin-bottom: 16px; }
+                li { margin-bottom: 8px; }
+                blockquote { border-left: 4px solid #d97706; padding-left: 16px; margin: 16px 0; font-style: italic; color: ${isDark ? '#888' : '#666'}; }
+            </style>
+        </head>
+        <body>
+            ${post.description}
+            <script>
+                function sendHeight() {
+                    var height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+                    window.ReactNativeWebView.postMessage(height.toString());
+                }
+                setTimeout(sendHeight, 100);
+                setTimeout(sendHeight, 500);
+                setTimeout(sendHeight, 1000);
+                window.addEventListener('resize', sendHeight);
+                document.addEventListener("DOMContentLoaded", sendHeight);
+            </script>
+        </body>
+        </html>
+    `;
+    const onShare = async () => {
+        try {
+            await Share.share({
+                message: `${post.title} - Lee más en Crisol Ideas`,
+                url: `https://crisolideas.com/blog/${post.slug || post.id}`,
+                title: post.title,
+            });
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
+
     return (
         <View className="flex-1 bg-[#fdfdfc] dark:bg-[#121212]">
             {/* FLOATING HEADER */}
             <View className="absolute top-12 left-0 right-0 z-50 flex-row justify-between px-6">
-                <Pressable 
-                    onPress={() => navigation.goBack()}
-                    className="w-12 h-12 bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full items-center justify-center shadow-sm"
-                >
-                    <ArrowLeft size={24} color={isDark ? '#fff' : '#000'} strokeWidth={1.5} />
-                </Pressable>
-                
-                <Pressable 
+                <Pressable
+                    onPress={onShare}
                     className="w-12 h-12 bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full items-center justify-center shadow-sm"
                 >
                     <Share2 size={24} color={isDark ? '#fff' : '#000'} strokeWidth={1.5} />
@@ -118,8 +168,8 @@ export default function BlogPage() {
                             </Text>
                         </View>
 
-                        <Text 
-                            style={{ fontFamily: 'PlayfairDisplay_700Bold' }} 
+                        <Text
+                            style={{ fontFamily: 'PlayfairDisplay_700Bold' }}
                             className="text-4xl md:text-5xl text-[#1a1a1a] dark:text-[#f3f4f6] leading-[48px] tracking-tight mb-6"
                         >
                             {post.title}
@@ -142,20 +192,31 @@ export default function BlogPage() {
                         </View>
 
                         {/* SUBTITLE */}
-                        <Text 
-                            style={{ fontFamily: 'PlayfairDisplay_400Regular' }} 
+                        <Text
+                            style={{ fontFamily: 'PlayfairDisplay_400Regular' }}
                             className="text-2xl text-[#333] dark:text-[#d1d1d1] leading-9 italic mb-10"
                         >
                             {post.subTitle}
                         </Text>
 
                         {/* MAIN CONTENT TEXT */}
-                        <Text 
-                            style={{ fontFamily: 'Inter_400Regular' }} 
-                            className="text-[17px] text-[#444] dark:text-[#a3a3a3] leading-8 mb-8"
-                        >
-                            {post.description}
-                        </Text>
+                        <WebView
+                            source={{ html: htmlContent }}
+                            style={{ height: webViewHeight, width: width - 64, backgroundColor: 'transparent' }}
+                            scrollEnabled={false}
+                            showsVerticalScrollIndicator={false}
+                            showsHorizontalScrollIndicator={false}
+                            bounces={false}
+                            onMessage={(event) => {
+                                if (event.nativeEvent.data) {
+                                    const newHeight = Number(event.nativeEvent.data);
+                                    if (newHeight > 0 && newHeight !== webViewHeight) {
+                                        setWebViewHeight(newHeight);
+                                    }
+                                }
+                            }}
+                            containerStyle={{ marginBottom: 24 }}
+                        />
 
                         <View className="h-[1px] w-1/3 bg-[#d1d1d1] dark:bg-[#333] mb-12 self-center mt-6" />
 
@@ -167,7 +228,7 @@ export default function BlogPage() {
                             <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-center text-[#666] dark:text-[#999] mb-6 leading-6">
                                 Únete a nuestra newsletter para recibir las últimas historias y reflexiones directamente en tu bandeja.
                             </Text>
-                            <Pressable 
+                            <Pressable
                                 className="w-full bg-black dark:bg-white h-14 rounded-full items-center justify-center shadow-lg"
                                 onPress={() => navigation.navigate('RegisterPage')}
                             >
